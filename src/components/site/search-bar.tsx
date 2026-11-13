@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/cn";
@@ -42,24 +41,31 @@ export function SearchBar({
     router.push(`/search${params.size ? `?${params.toString()}` : ""}`);
   }
 
-  const cell = size === "sm" ? "px-3 py-2.5" : "px-4 py-3.5";
-  const labelClass = "block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted mb-1";
+  const cell = size === "sm" ? "px-3 py-2.5" : "px-5 py-4";
+  const labelClass =
+    "block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted mb-1.5";
 
   return (
     <form
       onSubmit={submit}
       className={cn(
-        "flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_18px_50px_-30px_rgba(25,23,19,0.25)] md:flex-row md:items-end",
+        "flex flex-col overflow-hidden rounded-2xl border border-line/80 bg-white shadow-[0_8px_32px_-8px_rgba(26,23,19,0.18)] md:flex-row md:items-stretch",
         className,
       )}
     >
-      <div className={cn("flex-1 border-b border-line md:border-b-0 md:border-r md:border-line", cell)}>
+      {/* Where */}
+      <div
+        className={cn(
+          "flex-1 border-b border-line/60 md:border-b-0 md:border-r md:border-line/60",
+          cell,
+        )}
+      >
         <label className={labelClass} htmlFor="search-city">
           Where
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Icon name="pin" size={18} className="text-gold" />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-0.5 pointer-events-none">
+            <Icon name="pin" size={16} className="text-gold" />
           </div>
           <input
             id="search-city"
@@ -67,7 +73,7 @@ export function SearchBar({
             value={city}
             onChange={(event) => setCity(event.target.value)}
             placeholder="Search by city"
-            className="w-full pl-10 pr-4 py-2 border-0 bg-transparent text-[14px] text-ink placeholder:text-muted/60 focus:outline-none"
+            className="w-full pl-6 pr-4 bg-transparent text-[14px] text-ink placeholder:text-muted/60 focus:outline-none"
             autoComplete="off"
           />
           <datalist id="nivas-cities">
@@ -78,7 +84,13 @@ export function SearchBar({
         </div>
       </div>
 
-      <div className={cn("border-b border-line md:w-[160px] md:border-b-0 md:border-r md:border-line", cell)}>
+      {/* Check in */}
+      <div
+        className={cn(
+          "border-b border-line/60 md:w-[160px] md:border-b-0 md:border-r md:border-line/60",
+          cell,
+        )}
+      >
         <label className={labelClass} htmlFor="search-checkin">
           Check in
         </label>
@@ -96,7 +108,13 @@ export function SearchBar({
         />
       </div>
 
-      <div className={cn("border-b border-line md:w-[160px] md:border-b-0 md:border-r md:border-line", cell)}>
+      {/* Check out */}
+      <div
+        className={cn(
+          "border-b border-line/60 md:w-[160px] md:border-b-0 md:border-r md:border-line/60",
+          cell,
+        )}
+      >
         <label className={labelClass} htmlFor="search-checkout">
           Check out
         </label>
@@ -110,19 +128,20 @@ export function SearchBar({
         />
       </div>
 
+      {/* Guests */}
       <div className={cn("md:w-[140px]", cell)}>
         <label className={labelClass} htmlFor="search-guests">
           Guests
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Icon name="guests" size={18} className="text-gold" />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-0.5 pointer-events-none">
+            <Icon name="guests" size={16} className="text-gold" />
           </div>
           <select
             id="search-guests"
             value={guests}
             onChange={(event) => setGuests(event.target.value)}
-            className="w-full pl-10 pr-8 py-2 border-0 bg-transparent text-[14px] text-ink focus:outline-none appearance-none cursor-pointer"
+            className="w-full pl-6 pr-6 bg-transparent text-[14px] text-ink focus:outline-none appearance-none cursor-pointer"
           >
             {[1, 2, 3, 4, 5, 6, 8, 10].map((count) => (
               <option key={count} value={count}>
@@ -130,14 +149,25 @@ export function SearchBar({
               </option>
             ))}
           </select>
-          <Icon name="chevron-down" size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+          <Icon
+            name="chevron-down"
+            size={14}
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+          />
         </div>
       </div>
 
-      <div className={cn("p-2.5 md:pr-2.5 md:pt-4", size === "sm" && "pt-0")}>
-        <Button type="submit" variant="primary" size={size === "sm" ? "md" : "lg"} fullWidth className="md:w-auto md:px-6 md:min-w-[140px]">
+      {/* Search button */}
+      <div className={cn("flex items-stretch p-2", size === "sm" && "pt-0")}>
+        <Button
+          type="submit"
+          variant="primary"
+          size={size === "sm" ? "md" : "lg"}
+          fullWidth
+          className="md:w-auto md:px-7 md:min-w-[140px] h-full"
+        >
           <Icon name="search" size={16} />
-          <span>Search stays</span>
+          <span>Search</span>
         </Button>
       </div>
     </form>

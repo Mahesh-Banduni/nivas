@@ -55,21 +55,21 @@ export function Button({
 }) {
   return (
     <button
-      className={buttonClass(variant, size, cn(fullWidth && "w-full", className))}
+      className={buttonClass(variant, size, cn("inline-flex flex-row items-center justify-center gap-2", fullWidth && "w-full", className))}
       disabled={props.disabled || isLoading}
       aria-busy={isLoading}
       {...props}
     >
       {isLoading ? (
-        <span className="inline-flex items-center gap-2">
+        <span className="inline-flex flex-row items-center justify-center gap-2">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
           <span>{children}</span>
         </span>
       ) : (
         <>
-          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+          {leftIcon && <span className="inline-flex shrink-0 items-center justify-center">{leftIcon}</span>}
           <span>{children}</span>
-          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+          {rightIcon && <span className="inline-flex shrink-0 items-center justify-center">{rightIcon}</span>}
         </>
       )}
     </button>
@@ -97,12 +97,12 @@ export function ButtonLink({
   return (
     <Link
       href={href}
-      className={buttonClass(variant, size, cn(fullWidth && "w-full", className))}
+      className={buttonClass(variant, size, cn("inline-flex flex-row items-center justify-center gap-2", fullWidth && "w-full", className))}
       {...props}
     >
-      {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+      {leftIcon && <span className="inline-flex shrink-0 items-center justify-center">{leftIcon}</span>}
       <span>{children}</span>
-      {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+      {rightIcon && <span className="inline-flex shrink-0 items-center justify-center">{rightIcon}</span>}
     </Link>
   );
 }

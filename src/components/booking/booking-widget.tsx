@@ -119,137 +119,144 @@ export function BookingWidget({
   }
 
   return (
-    <div className="surface overflow-hidden shadow-[0_24px_60px_-45px_rgba(25,23,19,0.5)]">
-      <div className="border-b border-line px-5 py-4">
+    <div className="surface-elevated overflow-hidden rounded-2xl border border-line bg-white shadow-[0_20px_48px_-20px_rgba(26,23,19,0.18)]">
+      <div className="border-b border-line/70 bg-gradient-to-b from-[#fbf8f2] to-white px-6 py-5">
         <div className="flex items-baseline gap-1.5">
-          <span className="display text-[26px] text-ink">{formatINR(nightlyPrice)}</span>
-          <span className="text-[12px] text-muted">/ night</span>
+          <span className="font-display text-[28px] font-medium leading-none text-ink">{formatINR(nightlyPrice)}</span>
+          <span className="text-[13px] text-muted">/ night</span>
         </div>
-        <p className="mt-0.5 text-[11.5px] text-muted">
-          {minNights > 1 ? `${minNights}-night minimum · ` : ""}sleeps {maxGuests}
+        <p className="mt-1 text-[12px] text-muted">
+          {minNights > 1 ? `${minNights}-night minimum · ` : ""}sleeps up to {maxGuests}
         </p>
       </div>
 
-      <div className="space-y-3 p-5">
-        <div className="grid grid-cols-2 gap-2">
-          <label className="rounded-lg border border-line-strong px-3 py-2">
-            <span className="block text-[9.5px] font-medium uppercase tracking-[0.12em] text-muted">Check in</span>
-            <input
-              type="date"
-              value={checkIn}
-              min={new Date().toISOString().slice(0, 10)}
-              onChange={(event) => {
-                const value = event.target.value;
-                setCheckIn(value);
-                if (value && checkOut && checkOut <= value) {
-                  const next = new Date(`${value}T00:00:00.000Z`);
-                  next.setUTCDate(next.getUTCDate() + Math.max(1, minNights));
-                  setCheckOut(next.toISOString().slice(0, 10));
-                }
-              }}
-              className="mt-1 w-full border-0 bg-transparent p-0 text-[12.5px] text-ink focus:outline-none"
-            />
-          </label>
-          <label className="rounded-lg border border-line-strong px-3 py-2">
-            <span className="block text-[9.5px] font-medium uppercase tracking-[0.12em] text-muted">Check out</span>
-            <input
-              type="date"
-              value={checkOut}
-              min={checkIn || new Date().toISOString().slice(0, 10)}
-              onChange={(event) => setCheckOut(event.target.value)}
-              className="mt-1 w-full border-0 bg-transparent p-0 text-[12.5px] text-ink focus:outline-none"
-            />
-          </label>
-        </div>
-
-        <div className="rounded-lg border border-line-strong px-3 py-2">
-          <span className="block text-[9.5px] font-medium uppercase tracking-[0.12em] text-muted">Guests</span>
-          <Select
-            value={guests}
-            onChange={(event) => setGuests(Number(event.target.value))}
-            className="mt-1 border-0 bg-transparent p-0 pr-6 text-[12.5px] focus:shadow-none"
-          >
-            {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
-              <option key={count} value={count}>
-                {count} {count === 1 ? "guest" : "guests"}
-              </option>
-            ))}
-          </Select>
+      <div className="space-y-4 p-6">
+        <div className="overflow-hidden rounded-xl border border-line-strong bg-cream/30">
+          <div className="grid grid-cols-2 divide-x divide-line-strong">
+            <label className="p-3 transition-colors hover:bg-white/80">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Check-in</span>
+              <input
+                type="date"
+                value={checkIn}
+                min={new Date().toISOString().slice(0, 10)}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setCheckIn(value);
+                  if (value && checkOut && checkOut <= value) {
+                    const next = new Date(`${value}T00:00:00.000Z`);
+                    next.setUTCDate(next.getUTCDate() + Math.max(1, minNights));
+                    setCheckOut(next.toISOString().slice(0, 10));
+                  }
+                }}
+                className="mt-1 w-full border-0 bg-transparent p-0 text-[13px] font-medium text-ink focus:outline-none"
+              />
+            </label>
+            <label className="p-3 transition-colors hover:bg-white/80">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Check-out</span>
+              <input
+                type="date"
+                value={checkOut}
+                min={checkIn || new Date().toISOString().slice(0, 10)}
+                onChange={(event) => setCheckOut(event.target.value)}
+                className="mt-1 w-full border-0 bg-transparent p-0 text-[13px] font-medium text-ink focus:outline-none"
+              />
+            </label>
+          </div>
+          <div className="border-t border-line-strong p-3 transition-colors hover:bg-white/80">
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Guests</span>
+            <Select
+              value={guests}
+              onChange={(event) => setGuests(Number(event.target.value))}
+              className="mt-1 border-0 bg-transparent p-0 pr-6 text-[13px] font-medium text-ink focus:shadow-none"
+            >
+              {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
+                <option key={count} value={count}>
+                  {count} {count === 1 ? "guest" : "guests"}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
 
         <button
           type="button"
           onClick={() => setShowCalendar((value) => !value)}
-          className="flex w-full items-center justify-between text-[11.5px] text-pine hover:underline"
+          className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-pine transition-colors hover:text-gold-deep"
         >
-          <span className="inline-flex items-center gap-1.5">
-            <Icon name="calendar" size={13} /> {showCalendar ? "Hide calendar" : "Check availability"}
-          </span>
+          <Icon name="calendar" size={14} />
+          <span>{showCalendar ? "Hide availability calendar" : "View calendar & availability"}</span>
           <Icon name={showCalendar ? "chevron-down" : "chevron-right"} size={13} />
         </button>
 
         {showCalendar && (
-          <AvailabilityCalendar
-            propertyId={propertyId}
-            checkIn={checkIn}
-            checkOut={checkOut}
-            minNights={minNights}
-            onChange={(nextIn, nextOut) => {
-              setCheckIn(nextIn);
-              setCheckOut(nextOut);
-            }}
-          />
+          <div className="animate-fade-in pt-1">
+            <AvailabilityCalendar
+              propertyId={propertyId}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              minNights={minNights}
+              onChange={(nextIn, nextOut) => {
+                setCheckIn(nextIn);
+                setCheckOut(nextOut);
+              }}
+            />
+          </div>
         )}
 
         {quoteError && (
-          <div className="flex items-start gap-2 rounded-lg bg-rose-soft px-3 py-2 text-[11.5px] text-rose">
-            <Icon name="alert" size={14} className="mt-0.5 shrink-0" />
-            {quoteError}
+          <div className="flex items-start gap-2.5 rounded-xl border border-rose/30 bg-rose-soft/80 p-3 text-[12px] text-rose">
+            <Icon name="alert" size={15} className="mt-0.5 shrink-0" />
+            <span>{quoteError}</span>
           </div>
         )}
         {!quoteError && nights > 0 && !meetMinimum && (
-          <p className="text-[11.5px] text-clay">
-            This home has a {minNights}–{maxNights} night stay window.
+          <p className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-[12px] text-amber-800">
+            This stay requires a {minNights}–{maxNights} night window.
           </p>
         )}
 
-        <Button onClick={reserve} disabled={!valid || !meetMinimum || pending || isOwner} className="w-full" size="lg">
-          {isOwner ? "This is your listing" : pending ? "Holding dates…" : signedIn ? "Reserve" : "Sign in to reserve"}
+        <Button
+          onClick={reserve}
+          disabled={!valid || !meetMinimum || pending || isOwner}
+          className="w-full shadow-gold"
+          size="lg"
+        >
+          {isOwner ? "This is your listing" : pending ? "Holding dates…" : signedIn ? "Reserve this stay" : "Sign in to reserve"}
           {!pending && !isOwner && <Icon name="arrow-right" size={15} />}
         </Button>
 
-        {error && <p className="text-center text-[11.5px] text-rose">{error}</p>}
-        <p className="text-center text-[10.5px] text-muted">
-          You won&apos;t be charged yet · 15-minute hold after reserving
+        {error && <p className="text-center text-[12px] text-rose">{error}</p>}
+        <p className="text-center text-[11px] text-muted">
+          No charge right now · 15-minute lock on reserved dates
         </p>
 
         {quote && (
-          <div className="space-y-2 border-t border-line pt-4 text-[12.5px]">
-            <div className="flex justify-between text-muted">
+          <div className="space-y-2.5 border-t border-line/70 pt-4 text-[13px]">
+            <div className="flex justify-between text-ink-soft">
               <span>
                 {formatINR(quote.nightlyPrice)} × {quote.nights} {quote.nights === 1 ? "night" : "nights"}
               </span>
-              <span className="text-ink">{formatINR(quote.subtotal)}</span>
+              <span className="font-medium text-ink">{formatINR(quote.subtotal)}</span>
             </div>
             {quote.cleaningFee > 0 && (
-              <div className="flex justify-between text-muted">
+              <div className="flex justify-between text-ink-soft">
                 <span>Cleaning fee</span>
-                <span className="text-ink">{formatINR(quote.cleaningFee)}</span>
+                <span className="font-medium text-ink">{formatINR(quote.cleaningFee)}</span>
               </div>
             )}
-            <div className="flex justify-between text-muted">
+            <div className="flex justify-between text-ink-soft">
               <span>Service fee</span>
-              <span className="text-ink">{formatINR(quote.serviceFee)}</span>
+              <span className="font-medium text-ink">{formatINR(quote.serviceFee)}</span>
             </div>
-            <div className="flex justify-between text-muted">
+            <div className="flex justify-between text-ink-soft">
               <span>GST on service fee</span>
-              <span className="text-ink">{formatINR(quote.taxAmount)}</span>
+              <span className="font-medium text-ink">{formatINR(quote.taxAmount)}</span>
             </div>
-            <div className={cn("flex justify-between border-t border-line pt-2.5 font-medium text-ink")}>
-              <span>Total</span>
-              <span>{formatted}</span>
+            <div className={cn("flex justify-between border-t border-line/70 pt-3 text-[14px] font-semibold text-ink")}>
+              <span>Total before taxes</span>
+              <span className="font-display text-[16px] text-gold-deep">{formatted}</span>
             </div>
-            {loading && <p className="text-right text-[10px] text-muted">Updating quote…</p>}
+            {loading && <p className="text-right text-[10.5px] text-muted animate-pulse">Recalculating quote…</p>}
           </div>
         )}
       </div>

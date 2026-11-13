@@ -80,52 +80,53 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     : null;
 
   return (
-    <div className="container-page py-6 lg:py-9">
-      {/* header */}
+    <div className="container-page py-6 lg:py-10">
+      {/* ── Breadcrumb & Top Bar ── */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <nav className="flex flex-wrap items-center gap-1.5 text-[11.5px] text-muted">
-            <Link href="/search" className="hover:text-ink">Stays</Link>
+          <nav className="flex flex-wrap items-center gap-1.5 text-[12px] font-medium text-muted">
+            <Link href="/search" className="transition-colors hover:text-ink">Stays</Link>
             <span>/</span>
-            <Link href={`/search?city=${encodeURIComponent(property.city)}`} className="hover:text-ink">
+            <Link href={`/search?city=${encodeURIComponent(property.city)}`} className="transition-colors hover:text-ink">
               {property.city}
             </Link>
             <span>/</span>
             <span className="text-ink-soft">{property.neighborhood ?? property.city}</span>
           </nav>
-          <h1 className="display mt-3 max-w-3xl text-[36px] leading-[1.05] text-ink sm:text-[46px]">
+          <h1 className="display mt-3 max-w-3xl text-[34px] leading-[1.08] text-ink sm:text-[44px]">
             {property.title}
           </h1>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12.5px] text-ink-soft">
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-ink-soft">
             {property.rating_count > 0 && (
-              <span className="inline-flex items-center gap-1.5">
-                <Icon name="star" size={13} className="fill-clay text-clay" />
-                <strong className="font-medium">{property.rating_avg.toFixed(2)}</strong>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <Icon name="star" size={13} className="fill-gold text-gold" />
+                <strong className="text-ink">{property.rating_avg.toFixed(2)}</strong>
                 <span className="text-muted">({property.rating_count} reviews)</span>
               </span>
             )}
-            <span className="inline-flex items-center gap-1.5">
-              <Icon name="pin" size={13} className="text-muted" />
+            <span className="inline-flex items-center gap-1.5 text-muted">
+              <Icon name="pin" size={13} className="text-gold/70" />
               {property.neighborhood ? `${property.neighborhood}, ` : ""}{property.city}, {property.state}
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Icon name="home" size={13} className="text-muted" /> {typeLabel(property.property_type)}
+            <span className="inline-flex items-center gap-1.5 text-muted">
+              <Icon name="home" size={13} className="text-pine/70" /> {typeLabel(property.property_type)}
             </span>
             {property.status !== "published" && <StatusBadge status={property.status} />}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <WishlistButton propertyId={property.id} initialSaved={saved.includes(property.id)} variant="inline" />
           <MessageHost propertyId={property.id} propertyTitle={property.title} signedIn={Boolean(user)} />
         </div>
       </div>
 
+      {/* ── Photo Gallery Grid ── */}
       {property.images.length > 0 ? (
-        <div className="mt-6 grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-[420px]">
+        <div className="mt-7 grid h-[320px] grid-cols-4 grid-rows-2 gap-2.5 overflow-hidden rounded-2xl ring-1 ring-black/[0.04] sm:h-[440px]">
           {property.images.slice(0, 5).map((image, index) => (
             <div
               key={image.id}
-              className={`relative overflow-hidden bg-sand ${
+              className={`group relative overflow-hidden bg-sand ${
                 index === 0
                   ? "col-span-4 row-span-2 sm:col-span-2"
                   : "hidden sm:block"
@@ -137,28 +138,31 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 type={property.property_type}
                 alt={image.alt ?? property.title}
                 priority={index === 0}
-                className="h-full w-full"
+                className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
               />
             </div>
           ))}
         </div>
       ) : (
-        <p className="surface-quiet mt-6 p-5 text-[13px] text-muted">No photos uploaded.</p>
+        <p className="surface-quiet mt-6 p-6 text-[13px] text-muted">No photos uploaded for this stay yet.</p>
       )}
 
-      <div className="mt-9 grid gap-12 lg:grid-cols-[1fr_368px]">
+      {/* ── Main Layout: Content + Sticky Booking ── */}
+      <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0">
-          {/* host strip */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-6">
-            <div className="flex items-center gap-3">
-              <Avatar name={property.owner_name} size={44} color="#22483B" />
+          {/* Host strip */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-7">
+            <div className="flex items-center gap-3.5">
+              <Avatar name={property.owner_name} size={48} color="#1e4d3d" />
               <div>
-                <p className="text-[14px] font-medium text-ink">
+                <p className="text-[15px] font-semibold text-ink">
                   Hosted by {property.owner_business ?? property.owner_name}
                 </p>
-                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11.5px] text-muted">
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted">
                   {property.owner_verified === "verified" && (
-                    <span className="inline-flex items-center gap-1 text-pine"><Icon name="shield" size={11} /> Verified host</span>
+                    <span className="inline-flex items-center gap-1 font-medium text-pine">
+                      <Icon name="shield" size={12} /> Verified host
+                    </span>
                   )}
                   <span>{ownerStats.listings} {ownerStats.listings === 1 ? "home" : "homes"}</span>
                   <span>·</span>
@@ -166,98 +170,108 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-4 text-center">
+            <div className="flex flex-wrap gap-5 text-center">
               {[
                 [property.rating_avg > 0 ? property.rating_avg.toFixed(2) : "New", "rating"],
                 ["Instant", "confirm"],
-                ["24h", "support"],
+                ["24/7", "support"],
               ].map(([value, label]) => (
-                <div key={label}>
-                  <p className="font-display text-[17px] text-ink">{value}</p>
-                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">{label}</p>
+                <div key={label} className="min-w-[52px]">
+                  <p className="font-display text-[18px] font-semibold text-ink">{value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{label}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* highlights */}
-          <div className="border-b border-line py-7">
-            <h2 className="font-display text-[24px] text-ink">The essentials</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {/* Essentials / Highlights */}
+          <div className="border-b border-line py-8">
+            <p className="eyebrow mb-1">Key features</p>
+            <h2 className="font-display text-[24px] font-medium text-ink">The essentials</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {[
                 { icon: "home" as const, title: typeLabel(property.property_type), body: `${property.bedrooms} bedrooms · ${property.beds} beds · ${property.bathrooms} baths` },
-                { icon: "guests" as const, title: `Sleeps ${property.max_guests}`, body: "Maximum guest capacity" },
+                { icon: "guests" as const, title: `Sleeps up to ${property.max_guests}`, body: "Maximum guest capacity" },
                 { icon: "clock" as const, title: `${property.rules?.check_in_time ?? "14:00"} check-in`, body: `Check-out by ${property.rules?.check_out_time ?? "11:00"}` },
-                ...(property.featured ? [{ icon: "star" as const, title: "Featured listing", body: "Highlighted by the platform" }] : []),
+                ...(property.featured ? [{ icon: "star" as const, title: "Curated highlight", body: "Handpicked by our editorial team" }] : []),
               ].map((item) => (
-                <div key={item.title} className="flex gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sand text-pine">
-                    <Icon name={item.icon} size={16} />
+                <div key={item.title} className="flex gap-3.5 rounded-xl border border-line bg-cream/40 p-3.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-soft text-gold-deep">
+                    <Icon name={item.icon} size={18} />
                   </span>
                   <div>
-                    <p className="text-[13px] font-medium text-ink">{item.title}</p>
-                    <p className="mt-0.5 text-[11.5px] leading-relaxed text-muted">{item.body}</p>
+                    <p className="text-[13.5px] font-semibold text-ink">{item.title}</p>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-muted">{item.body}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* description */}
-          {description.length > 0 && <div className="border-b border-line py-7">
-            <h2 className="font-display text-[24px] text-ink">About this home</h2>
-            <div className="mt-3 space-y-3 text-[13.5px] leading-[1.75] text-ink-soft">
-              {description.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          {/* About description */}
+          {description.length > 0 && (
+            <div className="border-b border-line py-8">
+              <p className="eyebrow mb-1">Overview</p>
+              <h2 className="font-display text-[24px] font-medium text-ink">About this home</h2>
+              <div className="mt-4 space-y-3.5 text-[14px] leading-[1.8] text-ink-soft">
+                {description.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+              </div>
             </div>
-          </div>}
+          )}
 
-          {/* amenities */}
-          <div className="border-b border-line py-7">
-            <h2 className="font-display text-[24px] text-ink">What this place offers</h2>
-            <div className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+          {/* Amenities */}
+          <div className="border-b border-line py-8">
+            <p className="eyebrow mb-1">Inclusions</p>
+            <h2 className="font-display text-[24px] font-medium text-ink">What this place offers</h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {property.amenities.map((amenity) => (
-                <div key={amenity.id} className="flex items-center gap-2.5 text-[12.5px] text-ink-soft">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cream text-pine">
+                <div
+                  key={amenity.id}
+                  className="flex items-center gap-3 rounded-xl border border-line/70 bg-white p-3 text-[13px] font-medium text-ink-soft shadow-xs"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-pine-soft text-pine">
                     <Icon name={amenity.icon} size={16} />
                   </span>
-                  {amenity.name}
+                  <span>{amenity.name}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* rules */}
-          <div className="border-b border-line py-7">
-            <h2 className="font-display text-[24px] text-ink">House rules & cancellation</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <div className="surface-quiet p-4">
-                <p className="eyebrow mb-2">Stay window</p>
-                <p className="text-[12.5px] leading-relaxed text-ink-soft">
+          {/* Rules & Cancellation */}
+          <div className="border-b border-line py-8">
+            <p className="eyebrow mb-1">Policies</p>
+            <h2 className="font-display text-[24px] font-medium text-ink">House rules & cancellation</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+                <p className="eyebrow mb-2">Stay Window</p>
+                <p className="text-[13px] leading-relaxed text-ink-soft">
                   Minimum {property.rules?.min_nights ?? 1} nights, maximum {property.rules?.max_nights ?? 30} nights.
                   Check-in from {property.rules?.check_in_time ?? "14:00"}, check-out by {property.rules?.check_out_time ?? "11:00"}.
                 </p>
                 {property.rules?.house_rules && (
-                  <p className="mt-3 border-t border-line pt-3 text-[12px] leading-relaxed text-muted">
+                  <p className="mt-3 border-t border-line/60 pt-3 text-[12px] leading-relaxed text-muted">
                     {property.rules.house_rules}
                   </p>
                 )}
               </div>
-              <div className="surface-quiet p-4">
-                <p className="eyebrow mb-2">Cancellation</p>
-                <p className="text-[12.5px] leading-relaxed text-ink-soft">
+              <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+                <p className="eyebrow mb-2">Cancellation Policy</p>
+                <p className="text-[13px] leading-relaxed text-ink-soft">
                   {cancellationCopy(property.rules?.cancellation_policy)}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* map */}
-          <div className="border-b border-line py-7">
-            <h2 className="font-display text-[24px] text-ink">Where you&apos;ll be</h2>
-            <div className="relative mt-4 h-64 overflow-hidden rounded-xl border border-line bg-sand sm:h-72">
+          {/* Map */}
+          <div className="border-b border-line py-8">
+            <p className="eyebrow mb-1">Location</p>
+            <h2 className="font-display text-[24px] font-medium text-ink">Where you&apos;ll be</h2>
+            <div className="relative mt-5 h-64 overflow-hidden rounded-2xl border border-line bg-sand sm:h-80 shadow-xs">
               {mapEmbedUrl ? (
                 <iframe
-                  title={`OpenStreetMap showing the approximate area around ${property.neighborhood ?? property.city}`}
+                  title={`OpenStreetMap showing area around ${property.neighborhood ?? property.city}`}
                   src={mapEmbedUrl}
                   className="h-full w-full border-0"
                   loading="lazy"
@@ -265,13 +279,13 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-                  <Icon name="pin" size={24} className="text-pine" />
+                  <Icon name="pin" size={26} className="text-pine" />
                   <p className="font-medium text-ink">{property.neighborhood ?? property.city}, {property.state}</p>
-                  <p className="text-sm text-muted">Map preview isn&apos;t available for this listing yet.</p>
+                  <p className="text-[13px] text-muted">Map preview isn&apos;t available for this listing yet.</p>
                 </div>
               )}
               {approximateLocation && (
-                <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[10.5px] text-ink shadow-sm">
+                <span className="pointer-events-none absolute bottom-3.5 left-3.5 rounded-full border border-line/80 bg-white/95 px-3 py-1.5 text-[11px] font-medium text-ink shadow-sm backdrop-blur-sm">
                   Approximate area · {property.neighborhood ?? property.city}
                 </span>
               )}
@@ -280,48 +294,52 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               href={mapHref}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-medium text-pine hover:text-gold-deep"
+              className="mt-3.5 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-pine transition-colors hover:text-gold-deep"
             >
-              View on OpenStreetMap <Icon name="arrow-up-right" size={13} />
+              <span>View larger map on OpenStreetMap</span>
+              <Icon name="arrow-up-right" size={13} />
             </a>
           </div>
 
-          {/* reviews */}
-          <div className="py-7">
+          {/* Reviews */}
+          <div className="py-8">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-[24px] text-ink">
-                Guest reviews
-                {property.rating_count > 0 && <span className="ml-2 text-[14px] text-muted">({property.rating_count})</span>}
-              </h2>
-              <Stars rating={property.rating_avg} size={16} className="text-clay" />
+              <div>
+                <p className="eyebrow mb-1">Feedback</p>
+                <h2 className="font-display text-[24px] font-medium text-ink">
+                  Guest reviews
+                  {property.rating_count > 0 && <span className="ml-2 text-[14px] text-muted">({property.rating_count})</span>}
+                </h2>
+              </div>
+              <Stars rating={property.rating_avg} size={16} className="text-gold" />
             </div>
 
             {reviews.length ? (
-              <div className="mt-5 grid gap-6 md:grid-cols-[200px_1fr]">
-                <div className="space-y-1.5">
+              <div className="mt-6 grid gap-7 md:grid-cols-[210px_1fr]">
+                <div className="space-y-2 rounded-xl border border-line bg-cream/40 p-4">
                   {ratingBuckets.map((bucket) => (
-                    <div key={bucket.stars} className="flex items-center gap-2 text-[11px] text-muted">
-                      <span className="w-3 text-right">{bucket.stars}</span>
+                    <div key={bucket.stars} className="flex items-center gap-2.5 text-[11.5px] text-muted">
+                      <span className="w-3 text-right font-medium text-ink">{bucket.stars}</span>
                       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-sand">
-                        <div className="h-full rounded-full bg-pine/60" style={{ width: `${(bucket.count / maxBucket) * 100}%` }} />
+                        <div className="h-full rounded-full bg-gold" style={{ width: `${(bucket.count / maxBucket) * 100}%` }} />
                       </div>
                       <span className="w-4 text-right">{bucket.count}</span>
                     </div>
                   ))}
                 </div>
-                <div className="space-y-5">
+                <div className="space-y-6">
                   {reviews.map((review) => (
-                    <article key={review.id} className="border-b border-line pb-5 last:border-0">
-                      <div className="flex items-center gap-2.5">
-                        <Avatar name={review.guest_name} color={review.avatar_color} size={32} />
+                    <article key={review.id} className="rounded-xl border border-line/80 bg-white p-5 shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={review.guest_name} color={review.avatar_color} size={36} />
                         <div>
-                          <p className="text-[12.5px] font-medium text-ink">{review.guest_name}</p>
-                          <p className="text-[10.5px] text-muted">{formatDate(review.created_at.slice(0, 10), "long")}</p>
+                          <p className="text-[13px] font-semibold text-ink">{review.guest_name}</p>
+                          <p className="text-[11px] text-muted">{formatDate(review.created_at.slice(0, 10), "long")}</p>
                         </div>
-                        <Stars rating={review.rating} size={12} className="ml-auto text-clay" />
+                        <Stars rating={review.rating} size={12} className="ml-auto text-gold" />
                       </div>
-                      <p className="mt-2.5 text-[12.5px] leading-relaxed text-ink-soft">{review.comment}</p>
-                      <div className="mt-2 flex flex-wrap gap-3 text-[10.5px] text-muted">
+                      <p className="mt-3 text-[13px] leading-relaxed text-ink-soft">{review.comment}</p>
+                      <div className="mt-3 flex flex-wrap gap-2.5 border-t border-line/50 pt-2.5 text-[11px] text-muted">
                         {[
                           ["Cleanliness", review.cleanliness],
                           ["Accuracy", review.accuracy],
@@ -329,7 +347,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                           ["Location", review.location],
                           ["Value", review.value],
                         ].map(([label, value]) =>
-                          value ? <span key={String(label)}>{label} {value}/5</span> : null,
+                          value ? (
+                            <span key={String(label)} className="rounded-md bg-cream px-2 py-0.5 font-medium">
+                              {label} {value}/5
+                            </span>
+                          ) : null,
                         )}
                       </div>
                     </article>
@@ -337,12 +359,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 </div>
               </div>
             ) : (
-              <p className="mt-3 text-[12.5px] text-muted">No reviews yet. This home is new to the collection.</p>
+              <p className="mt-4 text-[13px] text-muted">No reviews yet. This stay is a fresh addition to our verified portfolio.</p>
             )}
           </div>
         </div>
 
-        {/* booking column */}
+        {/* ── Booking column ── */}
         <aside className="lg:relative">
           <div className="lg:sticky lg:top-24">
             <BookingWidget
@@ -357,25 +379,24 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               initialCheckOut={dates.checkOut}
               initialGuests={Math.min(2, property.max_guests)}
             />
-            <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-line bg-cream/60 p-3.5 text-[11px] leading-relaxed text-muted">
-              <Icon name="shield" size={14} className="mt-0.5 shrink-0 text-pine" />
+            <div className="mt-3.5 flex items-start gap-2.5 rounded-xl border border-line/80 bg-cream/60 p-4 text-[11.5px] leading-relaxed text-muted">
+              <Icon name="shield" size={15} className="mt-0.5 shrink-0 text-pine" />
               <span>
-                Your dates are held for 15 minutes while you check out. Payment is captured by
-                Razorpay and every confirmation is verified by a signed webhook.
+                Your dates are secured for 15 minutes during checkout. Transactions are encrypted and powered by Razorpay.
               </span>
             </div>
             {isOwner && (
-              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-gold/30 bg-gold-soft px-3.5 py-2.5 text-[11px] text-[#7d6129]">
-                Owner preview
-                <Link href={`/owner/properties/${property.id}/edit`} className="font-medium underline">
+              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-gold/30 bg-gold-soft px-4 py-3 text-[12px] font-medium text-gold-deep">
+                <span>Owner preview mode</span>
+                <Link href={`/owner/properties/${property.id}/edit`} className="underline underline-offset-2">
                   Edit listing
                 </Link>
               </div>
             )}
             {isAdmin && (
-              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-line bg-cream px-3.5 py-2.5 text-[11px] text-muted">
-                Admin view
-                <Link href="/admin/moderation" className="font-medium text-pine underline">
+              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-line bg-cream px-4 py-3 text-[12px] text-muted">
+                <span>Admin preview</span>
+                <Link href="/admin/moderation" className="font-medium text-pine underline underline-offset-2">
                   Moderation queue
                 </Link>
               </div>
@@ -384,18 +405,19 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
         </aside>
       </div>
 
+      {/* ── Similar stays ── */}
       {similar.length > 0 && (
         <section className="mt-16 border-t border-line pt-12">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="eyebrow">Nearby</p>
-              <h2 className="display mt-2 text-[28px] text-ink">You might also like</h2>
+              <p className="eyebrow mb-1">Explore more</p>
+              <h2 className="display text-[26px] text-ink">You might also like</h2>
             </div>
-            <Link href="/search" className="text-[12px] text-pine hover:underline">
-              All stays
+            <Link href="/search" className="text-[13px] font-medium text-pine hover:text-gold-deep transition-colors">
+              View all stays →
             </Link>
           </div>
-          <div className="mt-7 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {similar.map((item) => (
               <PropertyCard key={item.id} property={item} saved={saved.includes(item.id)} />
             ))}

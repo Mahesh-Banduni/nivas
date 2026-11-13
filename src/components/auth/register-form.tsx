@@ -45,27 +45,31 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        {[
-          { value: "guest" as const, label: "I'm a guest", detail: "Book stays" },
-          { value: "owner" as const, label: "I'm a host", detail: "List a home" },
-        ].map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => setRole(option.value)}
-            className={cn(
-              "rounded-xl border px-3.5 py-3 text-left transition",
-              role === option.value
-                ? "border-pine bg-pine-soft/60"
-                : "border-line bg-cream hover:border-line-strong",
-            )}
-          >
-            <span className="block text-[13px] font-medium text-ink">{option.label}</span>
-            <span className="mt-0.5 block text-[11px] text-muted">{option.detail}</span>
-          </button>
-        ))}
+    <form onSubmit={submit} className="space-y-5">
+      {/* Role selector */}
+      <div>
+        <p className="label mb-2">I want to</p>
+        <div className="grid grid-cols-2 gap-2.5">
+          {[
+            { value: "guest" as const, label: "Book stays", detail: "Find & reserve properties" },
+            { value: "owner" as const, label: "List my home", detail: "Become a verified host" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setRole(option.value)}
+              className={cn(
+                "rounded-xl border px-4 py-3.5 text-left transition-all",
+                role === option.value
+                  ? "border-pine bg-pine-soft/50 shadow-sm"
+                  : "border-line bg-cream/60 hover:border-line-strong hover:bg-cream",
+              )}
+            >
+              <span className="block text-[13.5px] font-semibold text-ink">{option.label}</span>
+              <span className="mt-0.5 block text-[11.5px] leading-snug text-muted">{option.detail}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <Field label="Full name" htmlFor="fullName">
@@ -75,10 +79,11 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           minLength={2}
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          placeholder="Full name"
+          placeholder="Your full name"
           autoComplete="name"
         />
       </Field>
+
       <Field label="Email address" htmlFor="email">
         <Input
           id="email"
@@ -86,11 +91,12 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email address"
+          placeholder="you@example.com"
           autoComplete="email"
         />
       </Field>
-      <Field label="Password" htmlFor="password" hint="At least 8 characters.">
+
+      <Field label="Password" htmlFor="password" hint="Minimum 8 characters.">
         <Input
           id="password"
           type="password"
@@ -98,24 +104,29 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="Password"
+          placeholder="••••••••"
           autoComplete="new-password"
         />
       </Field>
 
       {role === "owner" && (
-        <Field label="Hosting as" htmlFor="businessName" hint="This is the name guests see on your listings.">
+        <Field
+          label="Hosting business name"
+          htmlFor="businessName"
+          hint="This name appears on your listings."
+        >
           <Input
             id="businessName"
             required
             value={businessName}
             onChange={(event) => setBusinessName(event.target.value)}
-            placeholder="Business name"
+            placeholder="e.g. Priya's Escapes"
           />
         </Field>
       )}
 
       <FormError>{error}</FormError>
+
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
         {!pending && <Icon name="arrow-right" size={15} />}

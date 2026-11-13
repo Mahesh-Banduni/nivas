@@ -43,7 +43,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const maxPrice = Number(single(params.maxPrice) ?? 0) || undefined;
   const checkIn = single(params.checkIn) ?? "";
   const checkOut = single(params.checkOut) ?? "";
-  const sort = (single(params.sort) as "recommended" | "price_asc" | "price_desc" | "rating" | "newest") ?? "recommended";
+  const sort =
+    (single(params.sort) as "recommended" | "price_asc" | "price_desc" | "rating" | "newest") ??
+    "recommended";
   const page = Math.max(1, Number(single(params.page) ?? 1));
   const selectedAmenities = (
     Array.isArray(params.amenity) ? params.amenity : params.amenity ? [params.amenity] : []
@@ -69,165 +71,202 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   ]);
   const saved = user ? await savedPropertyIds(user.id) : [];
   const totalPages = Math.max(1, Math.ceil(result.total / result.perPage));
-  const activeFilterCount = [city, type, guests, minPrice, maxPrice, checkIn, checkOut].filter(Boolean).length + selectedAmenities.length;
+  const activeFilterCount =
+    [city, type, guests, minPrice, maxPrice, checkIn, checkOut].filter(Boolean).length +
+    selectedAmenities.length;
   const heading = city ? `Stays in ${city}` : "Every stay, in one place";
 
   return (
-    <div className="container-page py-10 lg:py-14">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Explore</p>
-          <h1 className="display mt-2 text-[36px] leading-tight text-ink sm:text-[42px]">{heading}</h1>
-          <p className="mt-2 text-[13.5px] text-muted">
-            {result.total} {result.total === 1 ? "home" : "homes"}
-            {checkIn && checkOut ? ` available ${checkIn} → ${checkOut}` : " across the collection"}
-            {guests ? ` · sleeps ${guests}+` : ""}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/destinations" className="btn btn-outline btn-sm">
-            <Icon name="pin" size={14} /> Destinations
-          </Link>
+    <div>
+      {/* ── Page hero ── */}
+      <div className="border-b border-line/60 bg-gradient-to-b from-[#f9f4ea] to-[#fdfaf5] py-10">
+        <div className="container-page">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow mb-2">Explore</p>
+              <h1 className="display text-[clamp(2rem,4vw,2.75rem)] leading-tight text-ink">
+                {heading}
+              </h1>
+              <p className="mt-2 text-[13.5px] text-muted">
+                {result.total} {result.total === 1 ? "home" : "homes"}
+                {checkIn && checkOut
+                  ? ` available ${checkIn} → ${checkOut}`
+                  : " across the collection"}
+                {guests ? ` · sleeps ${guests}+` : ""}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/destinations" className="btn btn-outline btn-sm">
+                <Icon name="pin" size={14} /> Destinations
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[248px_1fr]">
-        {/* filters */}
-        <aside>
-          <details className="surface overflow-hidden lg:hidden" open>
-            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-[13px] font-medium [&::-webkit-details-marker]:hidden">
-              Filters {activeFilterCount ? `(${activeFilterCount})` : ""}
-              <Icon name="sliders" size={15} className="text-muted" />
-            </summary>
-            <div className="border-t border-line p-4">
-              <FilterForm
-                params={params}
-                city={city}
-                type={type}
-                guests={guests}
-                minPrice={minPrice}
-                maxPrice={maxPrice}
-                checkIn={checkIn}
-                checkOut={checkOut}
-                amenities={amenities}
-                selectedAmenities={selectedAmenities}
-                destinations={destinations.map((destination) => destination.city)}
-                onMobile
-              />
-            </div>
-          </details>
-
-          <div className="sticky top-24 hidden space-y-5 lg:block">
-            <div className="flex items-center justify-between">
-              <p className="eyebrow">Refine</p>
-              {activeFilterCount > 0 && (
-                <Link href="/search" className="text-[11.5px] text-clay hover:underline">
-                  Clear all
-                </Link>
-              )}
-            </div>
-            <FilterForm
-              params={params}
-              city={city}
-              type={type}
-              guests={guests}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              checkIn={checkIn}
-              checkOut={checkOut}
-              amenities={amenities}
-              selectedAmenities={selectedAmenities}
-              destinations={destinations.map((destination) => destination.city)}
-            />
-          </div>
-        </aside>
-
-        {/* results */}
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-            <div className="hide-scrollbar flex gap-1.5 overflow-x-auto">
-              {[
-                { value: "recommended", label: "Recommended" },
-                { value: "price_asc", label: "Price · low" },
-                { value: "price_desc", label: "Price · high" },
-                { value: "rating", label: "Top rated" },
-                { value: "newest", label: "Newest" },
-              ].map((option) => (
-                <Link
-                  key={option.value}
-                  href={listing(params, { sort: option.value, page: undefined })}
-                  className={`chip ${sort === option.value ? "chip-active" : ""}`}
-                >
-                  {option.label}
-                </Link>
-              ))}
-            </div>
-            <span className="text-[11.5px] text-muted">
-              Page {result.page} of {totalPages}
-            </span>
-          </div>
-
-          {result.items.length ? (
-            <>
-              <div className="mt-7 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
-                {result.items.map((property, index) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={property}
-                    saved={saved.includes(property.id)}
-                    priority={index < 3}
-                  />
-                ))}
+      {/* ── Main content ── */}
+      <div className="container-page py-8 lg:py-12">
+        <div className="grid gap-8 lg:grid-cols-[248px_1fr]">
+          {/* ── Filters ── */}
+          <aside>
+            {/* Mobile filters (collapsible) */}
+            <details className="surface overflow-hidden lg:hidden" open>
+              <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-[13px] font-medium [&::-webkit-details-marker]:hidden">
+                Filters {activeFilterCount ? `(${activeFilterCount})` : ""}
+                <Icon name="sliders" size={15} className="text-muted" />
+              </summary>
+              <div className="border-t border-line p-4">
+                <FilterForm
+                  params={params}
+                  city={city}
+                  type={type}
+                  guests={guests}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  amenities={amenities}
+                  selectedAmenities={selectedAmenities}
+                  destinations={destinations.map((d) => d.city)}
+                  onMobile
+                />
               </div>
+            </details>
 
-              {totalPages > 1 && (
-                <div className="mt-12 flex items-center justify-between border-t border-line pt-6">
-                  {page > 1 ? (
-                    <ButtonLink href={listing(params, { page: String(page - 1) })} variant="outline" size="sm">
-                      <Icon name="arrow-left" size={14} /> Previous
-                    </ButtonLink>
-                  ) : (
-                    <span />
-                  )}
-                  <div className="flex gap-1">
-                    {Array.from({ length: totalPages }).slice(0, 7).map((_, index) => {
-                      const number = index + 1;
-                      return (
-                        <Link
-                          key={number}
-                          href={listing(params, { page: String(number) })}
-                          className={`flex h-8 w-8 items-center justify-center rounded-full text-[12px] ${
-                            number === page ? "bg-pine text-cream" : "text-ink-soft hover:bg-sand"
-                          }`}
-                        >
-                          {number}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  {page < totalPages ? (
-                    <ButtonLink href={listing(params, { page: String(page + 1) })} variant="outline" size="sm">
-                      Next <Icon name="arrow-right" size={14} />
-                    </ButtonLink>
-                  ) : (
-                    <span />
+            {/* Desktop filters (sticky card) */}
+            <div className="sticky top-24 hidden lg:block">
+              <div className="rounded-2xl border border-line bg-white p-5 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">
+                    Refine results
+                  </p>
+                  {activeFilterCount > 0 && (
+                    <Link
+                      href="/search"
+                      className="text-[11.5px] font-medium text-clay transition-colors hover:underline"
+                    >
+                      Clear all
+                    </Link>
                   )}
                 </div>
-              )}
-            </>
-          ) : (
-            <EmptyState
-              className="mt-8"
-              icon="search"
-              title="No homes match those filters"
-              description="Try widening your dates, raising the budget or removing an amenity. Our collection is small on purpose."
-              action={
-                <ButtonLink href="/search" variant="outline">
-                  Clear filters
-                </ButtonLink>
-              }
-            />
-          )}
+                <FilterForm
+                  params={params}
+                  city={city}
+                  type={type}
+                  guests={guests}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  amenities={amenities}
+                  selectedAmenities={selectedAmenities}
+                  destinations={destinations.map((d) => d.city)}
+                />
+              </div>
+            </div>
+          </aside>
+
+          {/* ── Results ── */}
+          <div>
+            {/* Sort chips + pagination info */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+              <div className="hide-scrollbar flex gap-1.5 overflow-x-auto">
+                {[
+                  { value: "recommended", label: "Recommended" },
+                  { value: "price_asc", label: "Price · low" },
+                  { value: "price_desc", label: "Price · high" },
+                  { value: "rating", label: "Top rated" },
+                  { value: "newest", label: "Newest" },
+                ].map((option) => (
+                  <Link
+                    key={option.value}
+                    href={listing(params, { sort: option.value, page: undefined })}
+                    className={`chip ${sort === option.value ? "chip-active" : ""}`}
+                  >
+                    {option.label}
+                  </Link>
+                ))}
+              </div>
+              <span className="text-[12px] font-medium text-muted">
+                {result.page} / {totalPages}
+              </span>
+            </div>
+
+            {result.items.length ? (
+              <>
+                <div className="mt-7 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
+                  {result.items.map((property, index) => (
+                    <PropertyCard
+                      key={property.id}
+                      property={property}
+                      saved={saved.includes(property.id)}
+                      priority={index < 3}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-12 flex items-center justify-between border-t border-line pt-6">
+                    {page > 1 ? (
+                      <ButtonLink
+                        href={listing(params, { page: String(page - 1) })}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Icon name="arrow-left" size={14} /> Previous
+                      </ButtonLink>
+                    ) : (
+                      <span />
+                    )}
+                    <div className="flex gap-1">
+                      {Array.from({ length: totalPages })
+                        .slice(0, 7)
+                        .map((_, index) => {
+                          const number = index + 1;
+                          return (
+                            <Link
+                              key={number}
+                              href={listing(params, { page: String(number) })}
+                              className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-medium transition-all ${
+                                number === page
+                                  ? "bg-pine text-cream shadow-sm"
+                                  : "text-ink-soft hover:bg-cream hover:text-ink"
+                              }`}
+                            >
+                              {number}
+                            </Link>
+                          );
+                        })}
+                    </div>
+                    {page < totalPages ? (
+                      <ButtonLink
+                        href={listing(params, { page: String(page + 1) })}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Next <Icon name="arrow-right" size={14} />
+                      </ButtonLink>
+                    ) : (
+                      <span />
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <EmptyState
+                className="mt-8"
+                icon="search"
+                title="No homes match those filters"
+                description="Try widening your dates, raising the budget or removing an amenity. Our collection is small on purpose."
+                action={
+                  <ButtonLink href="/search" variant="outline">
+                    Clear filters
+                  </ButtonLink>
+                }
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -262,8 +301,11 @@ function FilterForm({
   onMobile?: boolean;
 }) {
   return (
-    <form method="get" action="/search" className="space-y-4">
-      {single(params.sort) && <input type="hidden" name="sort" value={single(params.sort)} />}
+    <form method="get" action="/search" className="space-y-5">
+      {single(params.sort) && (
+        <input type="hidden" name="sort" value={single(params.sort)} />
+      )}
+
       <Field label="Destination" htmlFor={onMobile ? "m-city" : "city"}>
         <Select id={onMobile ? "m-city" : "city"} name="city" defaultValue={city}>
           <option value="">Anywhere</option>
@@ -275,18 +317,36 @@ function FilterForm({
         </Select>
       </Field>
 
+      <div className="h-px bg-line" />
+
       <div className="grid grid-cols-2 gap-2">
         <Field label="Check in" htmlFor={onMobile ? "m-checkin" : "checkin"}>
-          <Input id={onMobile ? "m-checkin" : "checkin"} type="date" name="checkIn" defaultValue={checkIn} />
+          <Input
+            id={onMobile ? "m-checkin" : "checkin"}
+            type="date"
+            name="checkIn"
+            defaultValue={checkIn}
+          />
         </Field>
         <Field label="Check out" htmlFor={onMobile ? "m-checkout" : "checkout"}>
-          <Input id={onMobile ? "m-checkout" : "checkout"} type="date" name="checkOut" defaultValue={checkOut} />
+          <Input
+            id={onMobile ? "m-checkout" : "checkout"}
+            type="date"
+            name="checkOut"
+            defaultValue={checkOut}
+          />
         </Field>
       </div>
 
+      <div className="h-px bg-line" />
+
       <div className="grid grid-cols-2 gap-2">
         <Field label="Guests" htmlFor={onMobile ? "m-guests" : "guests"}>
-          <Select id={onMobile ? "m-guests" : "guests"} name="guests" defaultValue={guests ?? ""}>
+          <Select
+            id={onMobile ? "m-guests" : "guests"}
+            name="guests"
+            defaultValue={guests ?? ""}
+          >
             <option value="">Any</option>
             {[1, 2, 3, 4, 5, 6, 8, 10].map((count) => (
               <option key={count} value={count}>
@@ -307,15 +367,17 @@ function FilterForm({
         </Field>
       </div>
 
+      <div className="h-px bg-line" />
+
       <div>
-        <p className="label">Budget per night</p>
+        <p className="label mb-3">Budget per night</p>
         <div className="grid grid-cols-2 gap-2">
           <Input
             type="number"
             name="minPrice"
             min={0}
             step={500}
-            placeholder="Minimum"
+            placeholder="Min"
             defaultValue={minPrice ?? ""}
             aria-label="Minimum price"
           />
@@ -324,7 +386,7 @@ function FilterForm({
             name="maxPrice"
             min={0}
             step={500}
-            placeholder="Maximum"
+            placeholder="Max"
             defaultValue={maxPrice ?? ""}
             aria-label="Maximum price"
           />
@@ -334,13 +396,15 @@ function FilterForm({
         </p>
       </div>
 
+      <div className="h-px bg-line" />
+
       <div>
-        <p className="label">Amenities</p>
+        <p className="label mb-3">Amenities</p>
         <div className="grid grid-cols-2 gap-1.5">
           {amenities.slice(0, 10).map((amenity) => (
             <label
               key={amenity.id}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-cream px-2.5 py-2 text-[11.5px] text-ink-soft transition has-[:checked]:border-pine has-[:checked]:bg-pine-soft/60"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border border-line bg-white px-3 py-2.5 text-[12px] font-medium text-ink-soft transition-all has-[:checked]:border-pine has-[:checked]:bg-pine-soft/50 has-[:checked]:text-pine-deep has-[:checked]:shadow-xs"
             >
               <input
                 type="checkbox"
@@ -355,10 +419,13 @@ function FilterForm({
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit" variant="secondary" className="w-full">
         <Icon name="search" size={15} /> Update results
       </Button>
-      <Link href="/search" className="block text-center text-[11.5px] text-muted hover:text-ink">
+      <Link
+        href="/search"
+        className="block text-center text-[12px] font-medium text-muted transition-colors hover:text-clay"
+      >
         Reset filters
       </Link>
     </form>

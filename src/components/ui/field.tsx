@@ -25,9 +25,9 @@ export function Field({
       )}
       {children}
       {error ? (
-        <p className="mt-1.5 text-xs text-rose">{error}</p>
+        <p className="mt-1.5 text-[12px] text-rose">{error}</p>
       ) : hint ? (
-        <p className="mt-1.5 text-xs text-muted">{hint}</p>
+        <p className="mt-1.5 text-[12px] text-muted">{hint}</p>
       ) : null}
     </div>
   );
@@ -39,9 +39,25 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
 
 export function Select({ className, children, ...props }: ComponentProps<"select">) {
   return (
-    <select className={cn("field appearance-none pr-8", className)} {...props}>
-      {children}
-    </select>
+    <div className="relative">
+      <select className={cn("field appearance-none pr-9", className)} {...props}>
+        {children}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          className="text-muted"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -58,18 +74,20 @@ export function Checkbox({
   return (
     <label
       className={cn(
-        "flex cursor-pointer items-start gap-2.5 rounded-lg border border-line bg-cream px-3 py-2.5 text-sm transition hover:border-line-strong has-[:checked]:border-pine has-[:checked]:bg-pine-soft/60",
+        "flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white/80 px-3.5 py-3 text-sm transition-all hover:border-line-strong hover:shadow-xs has-[:checked]:border-pine has-[:checked]:bg-pine-soft/40 has-[:checked]:shadow-xs",
         className,
       )}
     >
       <input
         type="checkbox"
-        className="mt-0.5 h-4 w-4 shrink-0 rounded border-line-strong accent-pine"
+        className="mt-0.5 h-4 w-4 cursor-pointer shrink-0 rounded accent-pine"
         {...props}
       />
       <span>
         <span className="block text-[13px] font-medium leading-tight text-ink">{label}</span>
-        {description && <span className="mt-0.5 block text-[11px] leading-snug text-muted">{description}</span>}
+        {description && (
+          <span className="mt-0.5 block text-[11px] leading-snug text-muted">{description}</span>
+        )}
       </span>
     </label>
   );
@@ -78,8 +96,17 @@ export function Checkbox({
 export function FormError({ children }: { children?: ReactNode }) {
   if (!children) return null;
   return (
-    <div className="flex items-start gap-2 rounded-lg border border-rose/30 bg-rose-soft px-3 py-2.5 text-[13px] text-rose">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="mt-0.5 shrink-0">
+    <div className="flex items-start gap-2.5 rounded-xl border border-rose/25 bg-rose-soft/70 px-4 py-3 text-[13px] text-rose backdrop-blur-sm">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        className="mt-0.5 shrink-0"
+        aria-hidden="true"
+      >
         <path d="M12 4 2.8 20h18.4Z" />
         <path d="M12 10v4M12 17.2v.3" strokeLinecap="round" />
       </svg>
@@ -98,22 +125,26 @@ export function SegmentedControl<T extends string>({
   options: Array<{ value: T; label: string; description?: string }>;
 }) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2">
+    <div className="grid gap-2.5 sm:grid-cols-2">
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative flex cursor-pointer items-start gap-2.5 rounded-xl border border-line bg-cream px-3.5 py-3 transition has-[:checked]:border-pine has-[:checked]:bg-pine-soft/60"
+          className="relative flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white/70 px-4 py-3.5 transition-all hover:border-line-strong hover:shadow-xs has-[:checked]:border-pine has-[:checked]:bg-pine-soft/40 has-[:checked]:shadow-sm"
         >
           <input
             type="radio"
             name={name}
             value={option.value}
             defaultChecked={value === option.value}
-            className="mt-1 h-3.5 w-3.5 accent-pine"
+            className="mt-1 h-3.5 w-3.5 cursor-pointer accent-pine"
           />
           <span>
-            <span className="block text-[13px] font-medium text-ink">{option.label}</span>
-            {option.description && <span className="mt-0.5 block text-[11px] leading-snug text-muted">{option.description}</span>}
+            <span className="block text-[13.5px] font-medium text-ink">{option.label}</span>
+            {option.description && (
+              <span className="mt-0.5 block text-[11.5px] leading-snug text-muted">
+                {option.description}
+              </span>
+            )}
           </span>
         </label>
       ))}

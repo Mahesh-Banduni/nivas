@@ -32,25 +32,21 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
       className={cn(
         "sticky top-0 z-40 transition-all duration-300",
         scrolled
-          ? "border-b border-line/60 bg-white/90 backdrop-blur-lg shadow-sm"
-          : "border-b border-transparent bg-transparent",
+          ? "bg-white/95 backdrop-blur-xl shadow-[0_1px_0_rgba(26,23,19,0.07)]"
+          : "bg-transparent border-b border-transparent",
       )}
     >
-      <div className="container-page flex h-[72px] items-center justify-between gap-6">
+      <div className="container-page flex h-[68px] items-center justify-between gap-6">
         <div className="flex items-center gap-9">
           <Link href="/" className="flex items-center" aria-label="Nivas Home">
             <Logo />
           </Link>
-          <nav className="hidden items-center gap-1 text-[13px] font-medium lg:flex" role="navigation" aria-label="Main navigation">
+          <nav className="hidden items-center gap-1 lg:flex" role="navigation" aria-label="Main navigation">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "relative px-3 py-2 rounded-lg text-ink-soft transition-all",
-                  "hover:text-gold hover:bg-gold-soft/50",
-                  "after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-0.5 after:bg-gold after:transition-all after:duration-300 hover:after:w-1/2 hover:after:left-0",
-                )}
+                className="px-3.5 py-2 rounded-lg text-[13.5px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04]"
               >
                 {item.label}
               </Link>
@@ -62,11 +58,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
           {/* Become a Host / Dashboard Link */}
           <Link
             href={isOwner ? "/owner" : "/become-a-host"}
-            className={cn(
-              "hidden px-3 py-2 rounded-lg text-[13px] font-medium transition-all",
-              "text-ink-soft hover:text-gold hover:bg-gold-soft/50",
-              "md:block",
-            )}
+            className="hidden px-3.5 py-2 rounded-lg text-[13.5px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04] md:block"
           >
             {isOwner ? "Host dashboard" : "List your home"}
           </Link>
@@ -103,8 +95,8 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
               <details className="group relative hidden sm:block">
                 <summary
                   className={cn(
-                    "flex cursor-pointer list-none items-center gap-2 rounded-full border border-line bg-cream py-1.5 pl-1.5 pr-3 transition-all [&::-webkit-details-marker]:hidden",
-                    "hover:border-gold/50 hover:bg-white hover:shadow-sm",
+                    "flex cursor-pointer list-none items-center gap-2 rounded-full border border-line-strong bg-white py-1.5 pl-1.5 pr-3.5 shadow-sm transition-all [&::-webkit-details-marker]:hidden",
+                    "hover:shadow-md hover:border-line-strong",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50",
                   )}
                   aria-label={`Account menu for ${user.name}`}
@@ -116,7 +108,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                   <Icon name="chevron-down" size={13} className="text-muted transition group-open:rotate-180" />
                 </summary>
 
-                <div className="absolute right-0 z-50 mt-2.5 hidden w-64 overflow-hidden rounded-2xl border border-line bg-cream p-2 shadow-[0_24px_60px_-30px_rgba(25,23,19,0.5)] animate-scale-in group-open:block">
+                <div className="absolute right-0 z-50 mt-2.5 hidden w-[260px] overflow-hidden rounded-2xl border border-line/80 bg-white/98 backdrop-blur-xl p-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] animate-scale-in group-open:block">
                   <div className="px-3 py-3 border-b border-line/50">
                     <p className="truncate text-[13px] font-medium text-ink">{user.name}</p>
                     <p className="truncate text-[11.5px] text-muted mt-0.5">{user.email}</p>
@@ -142,20 +134,17 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
 
                   <nav className="py-1" aria-label="User menu">
                     {[
-                      { href: "/bookings", label: "My trips", icon: "calendar" },
-                      { href: "/wishlist", label: "Saved stays", icon: "heart" },
-                      { href: "/messages", label: "Messages", icon: "message" },
-                      { href: "/account", label: "Account", icon: "user" },
+                      { href: "/bookings", label: "My trips", icon: "calendar", bg: "bg-sand" },
+                      { href: "/wishlist", label: "Saved stays", icon: "heart", bg: "bg-rose-soft" },
+                      { href: "/messages", label: "Messages", icon: "message", bg: "bg-sand" },
+                      { href: "/account", label: "Account", icon: "user", bg: "bg-sand" },
                     ].map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all",
-                          "hover:bg-gold-soft hover:text-gold-deep",
-                        )}
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all hover:bg-[#f5f1ea] hover:text-ink"
                       >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sand text-muted">
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${item.bg} text-muted`}>
                           <Icon name={item.icon} size={15} />
                         </div>
                         {item.label}
@@ -170,10 +159,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                         {isOwner && (
                           <Link
                             href="/owner"
-                            className={cn(
-                              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all",
-                              "hover:bg-pine-soft hover:text-pine-deep",
-                            )}
+                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all hover:bg-[#f5f1ea] hover:text-ink"
                           >
                             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-pine-soft text-pine">
                               <Icon name="home" size={15} />
@@ -184,10 +170,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                         {isAdmin && (
                           <Link
                             href="/admin"
-                            className={cn(
-                              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all",
-                              "hover:bg-gold-soft hover:text-gold-deep",
-                            )}
+                            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-ink-soft transition-all hover:bg-[#f5f1ea] hover:text-ink"
                           >
                             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gold-soft text-gold-deep">
                               <Icon name="shield" size={15} />
@@ -203,10 +186,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                   <form action={logoutAction}>
                     <button
                       type="submit"
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-ink-soft transition-all",
-                        "hover:bg-rose-soft hover:text-rose",
-                      )}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-ink-soft transition-all hover:bg-rose-soft hover:text-rose"
                     >
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-soft text-rose">
                         <Icon name="logout" size={15} />
@@ -221,11 +201,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
             <>
               <Link
                 href="/login"
-                className={cn(
-                  "hidden px-3 py-2 rounded-lg text-[13px] font-medium transition-all",
-                  "text-ink-soft hover:text-gold hover:bg-gold-soft/50",
-                  "sm:block",
-                )}
+                className="hidden px-3.5 py-2 rounded-lg text-[13.5px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04] sm:block"
               >
                 Sign in
               </Link>
@@ -240,10 +216,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
 
           {/* Mobile Menu Button */}
           <button
-            className={cn(
-              "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-cream text-ink-soft transition-all lg:hidden",
-              "hover:bg-gold-soft hover:text-gold hover:border-gold/50",
-            )}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-ink-soft transition-colors hover:bg-black/[0.05] hover:text-ink lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -258,7 +231,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
       {mobileMenuOpen && (
         <div
           id="mobile-menu"
-          className="lg:hidden animate-slide-up border-t border-line bg-white"
+          className="lg:hidden animate-slide-up border-t border-line/60 bg-white/98 backdrop-blur-xl"
         >
           <div className="container-page py-4 space-y-3">
             <nav className="space-y-1" aria-label="Mobile navigation">
@@ -267,10 +240,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "block rounded-xl px-4 py-3 text-[14px] font-medium transition-all",
-                    "text-ink-soft hover:text-gold hover:bg-gold-soft/50",
-                  )}
+                  className="block rounded-xl px-4 py-3 text-[14px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04]"
                 >
                   {item.label}
                 </Link>
@@ -278,7 +248,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
             </nav>
 
             {user && (
-              <nav className="space-y-1 border-t border-line pt-3" aria-label="Your account">
+              <nav className="space-y-1 border-t border-line/60 pt-3" aria-label="Your account">
                 {[
                   { href: "/bookings", label: "My trips" },
                   { href: "/wishlist", label: "Saved stays" },
@@ -291,7 +261,7 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block rounded-xl px-4 py-3 text-[14px] font-medium text-ink-soft transition-all hover:bg-gold-soft/50 hover:text-gold"
+                    className="block rounded-xl px-4 py-3 text-[14px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04]"
                   >
                     {item.label}
                   </Link>
@@ -311,17 +281,14 @@ export function SiteHeader({ user }: { user: CurrentUser | null }) {
               <Link
                 href="/become-a-host"
                 onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "block rounded-xl px-4 py-3 text-center text-[14px] font-medium transition-all",
-                  "text-ink-soft hover:text-gold hover:bg-gold-soft/50 border border-line",
-                )}
+                className="block rounded-xl px-4 py-3 text-center text-[14px] font-medium text-ink-soft transition-colors duration-150 hover:text-ink hover:bg-black/[0.04]"
               >
                 List your home
               </Link>
             )}
 
             {!user && (
-              <div className="space-y-2 pt-2 border-t border-line">
+              <div className="space-y-2 pt-2 border-t border-line/60">
                 <ButtonLink href="/register" variant="primary" fullWidth size="lg" onClick={() => setMobileMenuOpen(false)}>
                   Create account
                 </ButtonLink>

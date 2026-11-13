@@ -23,10 +23,10 @@ export function PropertyCard({
 
   if (variant === "row") {
     return (
-      <article className="group relative flex gap-4 rounded-2xl border border-line bg-white/80 p-3 transition-all hover:border-gold/30 hover:shadow-md">
+      <article className="group relative flex gap-5 rounded-2xl border border-line bg-white p-3.5 transition-all hover:border-gold/25 hover:shadow-md">
         <Link
           href={`/properties/${property.slug}`}
-          className="relative h-32 w-40 shrink-0 overflow-hidden rounded-xl bg-sand sm:h-36 sm:w-52"
+          className="relative h-[120px] w-[160px] shrink-0 overflow-hidden rounded-xl bg-sand sm:h-32 sm:w-48"
         >
           <ArtImage
             url={property.cover_url}
@@ -40,19 +40,22 @@ export function PropertyCard({
           <div>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gold-deep">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gold-deep">
                   {typeLabel(property.property_type)} · {property.city}
                 </p>
-                <h3 className="mt-1 truncate font-display text-lg leading-tight text-ink">
-                  <Link href={`/properties/${property.slug}`} className="link-underline hover:text-gold-deep">
+                <h3 className="mt-1 truncate font-display text-[18px] leading-tight text-ink">
+                  <Link
+                    href={`/properties/${property.slug}`}
+                    className="transition-colors hover:text-gold-deep"
+                  >
                     {property.title}
                   </Link>
                 </h3>
               </div>
               {property.rating_count > 0 && (
-                <span className="flex shrink-0 items-center gap-1 text-xs text-ink">
+                <span className="flex shrink-0 items-center gap-1 text-[12px] font-semibold text-ink">
                   <Icon name="star" size={11} className="fill-gold text-gold" />
-                  {property.rating_avg.toFixed(2)}
+                  {property.rating_avg.toFixed(1)}
                 </span>
               )}
             </div>
@@ -62,7 +65,7 @@ export function PropertyCard({
             </p>
           </div>
           <div className="mt-2 flex items-end justify-between">
-            <span className="text-sm">
+            <span className="text-[14px]">
               <span className="font-semibold text-ink">{formatINR(property.nightly_price)}</span>
               <span className="text-muted"> / night</span>
             </span>
@@ -76,8 +79,13 @@ export function PropertyCard({
   return (
     <article className="group relative animate-fade-up">
       <WishlistButton propertyId={property.id} initialSaved={saved} />
-      <Link href={`/properties/${property.slug}`} className="block group" aria-label={`View ${property.title}`}>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-sand">
+      <Link
+        href={`/properties/${property.slug}`}
+        className="block"
+        aria-label={`View ${property.title}`}
+      >
+        {/* Image */}
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-sand ring-1 ring-black/[0.04]">
           <ArtImage
             url={property.cover_url}
             mediaKey={property.cover_key}
@@ -86,82 +94,71 @@ export function PropertyCard({
             priority={priority}
             className="h-full w-full transition duration-[900ms] ease-out group-hover:scale-[1.04]"
           />
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
-          {/* Property type badge */}
-          <div className="absolute left-3 top-3 flex gap-1.5">
-            <span className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] backdrop-blur-sm",
-              "bg-white/95 text-ink shadow-sm",
-            )}>
+          {/* Gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/25 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+          {/* Top-left: type + featured badge */}
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.07em] text-ink shadow-sm backdrop-blur-sm">
               {typeLabel(property.property_type)}
             </span>
             {property.featured === 1 && (
-              <span className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] backdrop-blur-sm",
-                "bg-gold text-white shadow-gold",
-              )}>
-                <Icon name="star" size={10} />
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-deep px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.07em] text-white shadow-gold backdrop-blur-sm">
+                <Icon name="star" size={9} />
                 Featured
               </span>
             )}
           </div>
 
-          {/* Rating badge */}
+          {/* Top-right: rating */}
           {property.rating_count > 0 && (
             <div className="absolute right-3 top-3">
-              <span className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-semibold backdrop-blur-sm",
-                "bg-white/95 text-gold-deep shadow-sm",
-              )}>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold text-ink-soft shadow-sm backdrop-blur-sm">
                 <Icon name="star" size={11} className="fill-gold text-gold" />
                 {property.rating_avg.toFixed(1)}
               </span>
             </div>
           )}
         </div>
-        <div className="pt-4">
+
+        {/* Content */}
+        <div className="pt-3.5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="truncate font-display text-[20px] leading-snug text-ink group-hover:text-gold-deep transition-colors">
+              <h3 className="truncate font-display text-[19px] leading-snug text-ink transition-colors group-hover:text-gold-deep">
                 {property.title}
               </h3>
-              <p className="mt-1 flex items-center gap-1 text-[13px] text-muted">
-                <Icon name="pin" size={13} className="text-gold/70" />
+              <p className="mt-1 flex items-center gap-1.5 text-[12.5px] text-muted">
+                <Icon name="pin" size={12} className="shrink-0 text-gold/60" />
                 {property.neighborhood ? `${property.neighborhood}, ` : ""}
                 {property.city}
               </p>
             </div>
           </div>
+
           <div className="mt-3 flex items-baseline justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <p className="text-[15px]">
                 <span className="font-semibold text-ink">{formatINR(property.nightly_price)}</span>
-                <span className="text-muted"> / night</span>
+                <span className="text-[13px] text-muted"> / night</span>
               </p>
-              {property.featured === 1 && (
-                <StatusBadge status="featured" size="sm" showIcon />
-              )}
             </div>
-            <p className="text-[12.5px] text-muted flex items-center gap-1">
-              <Icon name="guests" size={13} />
+            <p className="flex items-center gap-1 text-[12px] text-muted">
+              <Icon name="guests" size={12} />
               sleeps {property.max_guests}
             </p>
           </div>
 
-          {/* Quick amenities */}
+          {/* Amenity chips */}
           {amenities.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {amenities.map((amenity) => (
                 <span
                   key={amenity}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] text-muted transition-colors",
-                    "hover:bg-gold-soft hover:text-gold-deep",
-                  )}
+                  className="inline-flex items-center gap-1 rounded-full bg-cream px-2.5 py-0.5 text-[10.5px] text-muted"
                 >
-                  <Icon name="check" size={10} className="text-gold/50" />
+                  <Icon name="check" size={9} className="text-pine/50" />
                   {amenity}
                 </span>
               ))}
@@ -175,14 +172,14 @@ export function PropertyCard({
 
 export function PropertyCardSkeleton() {
   return (
-    <div className="animate-fade-up animate-pulse">
+    <div className="animate-fade-up">
       <div className="aspect-[4/3] rounded-2xl bg-sand/70" />
       <div className="mt-4 space-y-3">
-        <div className="h-5 w-2/3 rounded bg-sand/70" />
-        <div className="h-3 w-1/2 rounded bg-sand/50" />
+        <div className="h-5 w-2/3 rounded-full bg-sand/70" />
+        <div className="h-3 w-1/2 rounded-full bg-sand/50" />
         <div className="flex items-center justify-between">
-          <div className="h-5 w-24 rounded bg-sand/70" />
-          <div className="h-5 w-16 rounded bg-sand/50" />
+          <div className="h-5 w-24 rounded-full bg-sand/70" />
+          <div className="h-4 w-16 rounded-full bg-sand/50" />
         </div>
       </div>
     </div>
