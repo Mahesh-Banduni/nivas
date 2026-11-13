@@ -13,7 +13,6 @@ import { cn } from "@/lib/cn";
 const NAV = [
   { href: "/search", label: "Explore stays" },
   { href: "/destinations", label: "Destinations" },
-  { href: "/how-it-works", label: "How it works" },
 ];
 
 export function SiteHeader({ user }: { user: CurrentUser | null }) {

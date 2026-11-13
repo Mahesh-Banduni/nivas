@@ -9,6 +9,7 @@
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
     "db:reset": "node scripts/reset-db.mjs",
+    "db:seed-admin": "node scripts/seed-admin.mjs",
     "test:booking": "node scripts/booking-concurrency-test.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

@@ -202,11 +202,11 @@ export function PropertyForm({
           </div>
 
           <div className="mt-4 space-y-4">
-            <Field label="Listing title" htmlFor="title" error={errors.title} hint="Something specific and evocative — “Villa Siolim”, not “Beautiful villa”.">
-              <Input id="title" name="title" required defaultValue={initial.title} placeholder="Villa Siolim" />
+            <Field label="Listing title" htmlFor="title" error={errors.title} hint="Choose a concise title guests can recognize.">
+              <Input id="title" name="title" required defaultValue={initial.title} placeholder="Property name" />
             </Field>
 
-            <Field label="Description" htmlFor="description" error={errors.description} hint="At least a short paragraph. Mention the setting, the restoration, the light.">
+            <Field label="Description" htmlFor="description" error={errors.description} hint="Describe the property and its features.">
               <Textarea
                 id="description"
                 name="description"
@@ -214,7 +214,7 @@ export function PropertyForm({
                 minLength={80}
                 rows={8}
                 defaultValue={initial.description}
-                placeholder="A laterite-and-lime villa tucked behind a lane of coconut palms…"
+                placeholder="Describe the property"
                 className="min-h-44"
               />
             </Field>
@@ -228,14 +228,14 @@ export function PropertyForm({
                 </Select>
               </Field>
               <Field label="City" htmlFor="city" error={errors.city}>
-                <Input id="city" name="city" required defaultValue={initial.city} placeholder="Goa" />
+                <Input id="city" name="city" required defaultValue={initial.city} placeholder="City" />
               </Field>
               <Field label="State" htmlFor="state" error={errors.state}>
-                <Input id="state" name="state" required defaultValue={initial.state} placeholder="Goa" />
+                <Input id="state" name="state" required defaultValue={initial.state} placeholder="State" />
               </Field>
             </div>
             <Field label="Neighbourhood" htmlFor="neighborhood" error={errors.neighborhood}>
-              <Input id="neighborhood" name="neighborhood" defaultValue={initial.neighborhood} placeholder="Siolim" />
+              <Input id="neighborhood" name="neighborhood" defaultValue={initial.neighborhood} placeholder="Neighbourhood" />
             </Field>
           </div>
         </section>
@@ -274,7 +274,7 @@ export function PropertyForm({
                 required
                 value={nightly}
                 onChange={(event) => setNightly(event.target.value)}
-                placeholder="14500"
+                placeholder="Price per night"
               />
             </Field>
             <Field label="Cleaning fee (₹)" htmlFor="cleaningFee" error={errors.cleaningFee} hint="Charged once per stay.">
@@ -323,15 +323,19 @@ export function PropertyForm({
           <h2 className="font-display text-[20px] text-ink">Amenities</h2>
           <p className="mt-1 text-[11px] text-muted">What makes the stay comfortable? Choose everything that applies.</p>
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {amenities.map((amenity) => (
-              <Checkbox
-                key={amenity.id}
-                name="amenities[]"
-                value={amenity.id}
-                label={amenity.name}
-                defaultChecked={selectedAmenities.includes(amenity.id)}
-              />
-            ))}
+            {amenities.length ? (
+              amenities.map((amenity) => (
+                <Checkbox
+                  key={amenity.id}
+                  name="amenities[]"
+                  value={amenity.id}
+                  label={amenity.name}
+                  defaultChecked={selectedAmenities.includes(amenity.id)}
+                />
+              ))
+            ) : (
+              <p className="text-[12px] text-muted">No amenities configured.</p>
+            )}
           </div>
         </section>
 
@@ -339,10 +343,10 @@ export function PropertyForm({
           <h2 className="font-display text-[20px] text-ink">Location</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="Latitude" htmlFor="latitude" error={errors.latitude} hint="Optional. Shown only as a rough area.">
-              <Input id="latitude" name="latitude" type="number" step="0.0001" defaultValue={initial.latitude} placeholder="15.6122" />
+              <Input id="latitude" name="latitude" type="number" step="0.0001" defaultValue={initial.latitude} placeholder="Latitude" />
             </Field>
             <Field label="Longitude" htmlFor="longitude" error={errors.longitude}>
-              <Input id="longitude" name="longitude" type="number" step="0.0001" defaultValue={initial.longitude} placeholder="73.7689" />
+              <Input id="longitude" name="longitude" type="number" step="0.0001" defaultValue={initial.longitude} placeholder="Longitude" />
             </Field>
           </div>
         </section>
@@ -405,7 +409,7 @@ export function PropertyForm({
               </div>
               {images.length === 0 && (
                 <p className="mt-3 text-[10.5px] text-muted">
-                  No photos yet — the listing will use an illustrated placeholder until you add one.
+                  No photos uploaded.
                 </p>
               )}
             </>

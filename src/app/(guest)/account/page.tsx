@@ -10,12 +10,14 @@ import { roleLabel } from "@/lib/labels";
 import { requireUser } from "@/modules/auth/session";
 import { profileForUser } from "@/modules/auth/auth.service";
 import { listNotifications } from "@/modules/notifications/notification.service";
+import { secret } from "@/infrastructure/cloudflare/env";
 import { markNotificationsReadAction } from "./actions";
 
 export const metadata: Metadata = { title: "Account" };
 
 export default async function AccountPage() {
   const user = await requireUser("/account");
+  const supportEmail = secret("SUPPORT_EMAIL").trim();
   const db = await getDb();
   const [{ owner }, notifications, stats, sessionRow] = await Promise.all([
     profileForUser(user),
@@ -175,36 +177,15 @@ export default async function AccountPage() {
             </div>
           </div>
 
-          <div className="surface p-5">
-            <p className="eyebrow mb-2">Demo environment</p>
-            <p className="text-[11.5px] leading-relaxed text-muted">
-              This build runs locally with seeded data. Payments are in signed demo mode because no
-              Razorpay keys are configured.
-            </p>
-            <div className="mt-3 space-y-1.5 text-[11px]">
-              {[
-                ["Guest", "kavya@nivas.test"],
-                ["Host", "arjun@nivas.test"],
-                ["Admin", "admin@nivas.test"],
-              ].map(([label, email]) => (
-                <div key={label} className="flex items-center justify-between gap-2">
-                  <span className="text-muted">{label}</span>
-                  <span className="text-ink">{email}</span>
-                </div>
-              ))}
-              <p className="pt-1 text-[10px] text-muted">Password for all: password123</p>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-line bg-cream p-5">
+          {supportEmail && <div className="rounded-xl border border-line bg-cream p-5">
             <p className="eyebrow mb-2">Need a hand?</p>
             <p className="text-[11.5px] leading-relaxed text-muted">
               The operations team can see your bookings, payments and message history.
             </p>
-            <a href="mailto:support@nivas.test" className="mt-2 inline-flex items-center gap-1 text-[11.5px] text-pine hover:underline">
-              support@nivas.test <Icon name="arrow-up-right" size={12} />
+            <a href={`mailto:${supportEmail}`} className="mt-2 inline-flex items-center gap-1 text-[11.5px] text-pine hover:underline">
+              {supportEmail} <Icon name="arrow-up-right" size={12} />
             </a>
-          </div>
+          </div>}
         </aside>
       </div>
     </div>

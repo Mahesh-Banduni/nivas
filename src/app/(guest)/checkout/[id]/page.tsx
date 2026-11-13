@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
 import { formatDate, formatDateRange } from "@/lib/date";
 import { formatINR } from "@/lib/money";
-import { isDemoPayments } from "@/infrastructure/payments/razorpay";
 import { requireUser } from "@/modules/auth/session";
 import { getCheckoutContext } from "@/modules/payments/payment.service";
 
@@ -162,7 +161,6 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
                   bookingId={booking.id}
                   total={booking.total_amount}
                   expiresAt={booking.hold_expires_at}
-                  demo={isDemoPayments()}
                   guestName={booking.guest_name}
                   guestEmail={booking.guest_email}
                   propertyTitle={booking.property_title}

@@ -7,18 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Field, FormError, Input } from "@/components/ui/field";
 import { Icon } from "@/components/ui/icon";
 
-const DEMOS = [
-  { label: "Guest", email: "kavya@nivas.test", detail: "Kavya · trips & saved stays" },
-  { label: "Host", email: "arjun@nivas.test", detail: "Arjun · 3 listings & earnings" },
-  { label: "Admin", email: "admin@nivas.test", detail: "Platform operations" },
-];
-
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") || "/";
-  const [email, setEmail] = useState("kavya@nivas.test");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -53,7 +47,7 @@ export function LoginForm() {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
+            placeholder="Email address"
           />
         </Field>
         <Field label="Password" htmlFor="password">
@@ -73,33 +67,6 @@ export function LoginForm() {
           {!pending && <Icon name="arrow-right" size={15} />}
         </Button>
       </form>
-
-      <div className="mt-7 rounded-xl border border-line bg-cream/70 p-4">
-        <p className="eyebrow mb-2.5">Demo accounts · password123</p>
-        <div className="space-y-1.5">
-          {DEMOS.map((demo) => (
-            <button
-              key={demo.email}
-              type="button"
-              onClick={() => {
-                setEmail(demo.email);
-                setPassword("password123");
-              }}
-              className={`flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-left transition ${
-                email === demo.email
-                  ? "border-pine/40 bg-pine-soft/60"
-                  : "border-line bg-cream hover:border-line-strong"
-              }`}
-            >
-              <span>
-                <span className="block text-[12.5px] font-medium text-ink">{demo.label}</span>
-                <span className="block text-[11px] text-muted">{demo.detail}</span>
-              </span>
-              <span className="text-[11px] text-muted">{demo.email}</span>
-            </button>
-          ))}
-        </div>
-      </div>
 
       <p className="mt-6 text-center text-[13px] text-muted">
         New to Nivas?{" "}

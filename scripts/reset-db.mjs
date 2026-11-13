@@ -6,7 +6,7 @@
  *   npm run db:reset -- --keep-media
  *
  * Stop the dev server first: the local adapter keeps an open SQLite handle.
- * The next request re-applies migrations and re-seeds the demo marketplace.
+ * The next request re-applies migrations to an empty local database.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -33,8 +33,4 @@ if (!keepMedia && fs.existsSync(mediaDir)) {
 console.log(removed ? `Removed ${removed} local artefact(s).` : "Nothing to remove.");
 console.log(`Database: ${dbFile}`);
 console.log(keepMedia ? "Media: kept" : `Media:    ${mediaDir}`);
-console.log("\nStart the app with `npm run dev` — migrations and demo seed run automatically.");
-console.log("Demo accounts all use the password: password123");
-console.log("  guest  kavya@nivas.test");
-console.log("  owner  arjun@nivas.test");
-console.log("  admin  admin@nivas.test");
+console.log("\nStart the app with `npm run dev` — migrations run automatically; no demo data is seeded.");

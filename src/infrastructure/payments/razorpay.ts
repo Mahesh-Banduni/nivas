@@ -1,13 +1,10 @@
 import crypto from "node:crypto";
 import { secret } from "../cloudflare/env";
-import { newId } from "@/lib/ids";
+import { unavailable } from "@/lib/errors";
 
 /**
- * Razorpay integration.
- *
- * With no keys configured the app runs in demo mode: orders are generated
- * locally and the "checkout" produces a signature with the same HMAC scheme
- * Razorpay uses, so the verification code path is identical in both modes.
+ * Razorpay integration. Payments are unavailable until both API credentials
+ * are configured.
  */
 
 export interface PaymentOrder {
@@ -16,21 +13,19 @@ export interface PaymentOrder {
   amount: number;
   currency: string;
   keyId: string;
-  demo: boolean;
 }
 
-export function isDemoPayments(): boolean {
-  return !secret("RAZORPAY_KEY_ID") || !secret("RAZORPAY_KEY_SECRET");
+export function isRazorpayConfigured(): boolean {
+  return Boolean(secret("RAZORPAY_KEY_ID") && secret("RAZORPAY_KEY_SECRET"));
 }
 
-function signingSecret(): string {
-  return secret("RAZORPAY_KEY_SECRET") || secret("SESSION_SECRET", "nivas-demo-secret");
-}
-
-function webhookSecret(): string {
-  const configuredSecret = secret("RAZORPAY_WEBHOOK_SECRET");
-  if (configuredSecret) return configuredSecret;
-  return isDemoPayments() ? `${signingSecret()}:webhook` : "";
+function apiCredentials() {
+  const keyId = secret("RAZORPAY_KEY_ID");
+  const keySecret = secret("RAZORPAY_KEY_SECRET");
+  if (!keyId || !keySecret) {
+    throw unavailable("Payments are not configured. Contact the site administrator.");
+  }
+  return { keyId, keySecret };
 }
 
 export async function createOrder(input: {
@@ -40,18 +35,8 @@ export async function createOrder(input: {
   notes?: Record<string, string>;
 }): Promise<PaymentOrder> {
   const currency = input.currency ?? "INR";
-  if (isDemoPayments()) {
-    return {
-      provider: "razorpay",
-      orderId: `order_demo_${newId("o").slice(2)}`,
-      amount: input.amount,
-      currency,
-      keyId: "rzp_demo_nivas",
-      demo: true,
-    };
-  }
-
-  const auth = Buffer.from(`${secret("RAZORPAY_KEY_ID")}:${secret("RAZORPAY_KEY_SECRET")}`).toString("base64");
+  const { keyId, keySecret } = apiCredentials();
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
   const response = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Basic ${auth}` },
@@ -72,8 +57,7 @@ export async function createOrder(input: {
     orderId: order.id,
     amount: order.amount,
     currency: order.currency,
-    keyId: secret("RAZORPAY_KEY_ID"),
-    demo: false,
+    keyId,
   };
 }
 
@@ -83,30 +67,20 @@ export function verifyPaymentSignature(input: {
   paymentId: string;
   signature: string;
 }): boolean {
+  const keySecret = secret("RAZORPAY_KEY_SECRET");
+  if (!keySecret) return false;
   const expected = crypto
-    .createHmac("sha256", signingSecret())
+    .createHmac("sha256", keySecret)
     .update(`${input.orderId}|${input.paymentId}`)
     .digest("hex");
   return timingSafeEqual(expected, input.signature);
 }
 
-/** Used by the demo checkout to produce a valid callback signature. */
-export function signDemoPayment(orderId: string, paymentId: string): string {
-  return crypto
-    .createHmac("sha256", signingSecret())
-    .update(`${orderId}|${paymentId}`)
-    .digest("hex");
-}
-
 export function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
-  const key = webhookSecret();
+  const key = secret("RAZORPAY_WEBHOOK_SECRET");
   if (!signature || !key) return false;
   const expected = crypto.createHmac("sha256", key).update(rawBody).digest("hex");
   return timingSafeEqual(expected, signature);
-}
-
-export function signDemoWebhook(rawBody: string): string {
-  return crypto.createHmac("sha256", webhookSecret()).update(rawBody).digest("hex");
 }
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -120,11 +94,9 @@ export async function createProviderRefund(input: {
   paymentId: string;
   amount: number;
   notes?: Record<string, string>;
-}): Promise<{ refundId: string; demo: boolean }> {
-  if (isDemoPayments()) {
-    return { refundId: `rfnd_demo_${newId("r").slice(2)}`, demo: true };
-  }
-  const auth = Buffer.from(`${secret("RAZORPAY_KEY_ID")}:${secret("RAZORPAY_KEY_SECRET")}`).toString("base64");
+}): Promise<{ refundId: string }> {
+  const { keyId, keySecret } = apiCredentials();
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
   const response = await fetch(`https://api.razorpay.com/v1/payments/${input.paymentId}/refund`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Basic ${auth}` },
@@ -134,5 +106,5 @@ export async function createProviderRefund(input: {
     throw new Error(`Razorpay refund failed: ${response.status} ${await response.text()}`);
   }
   const refund = (await response.json()) as { id: string };
-  return { refundId: refund.id, demo: false };
+  return { refundId: refund.id };
 }

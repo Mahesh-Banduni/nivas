@@ -9,9 +9,7 @@
     "binding": "ASSETS"
   },
   "vars": {
-    "APP_ENV": "production",
-    "APP_URL": "https://nivas.example",
-    "SUPABASE_STORAGE_BUCKET": "nivas-property-media"
+    "APP_ENV": "production"
   },
   "services": [
     {
@@ -30,8 +28,7 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "23cf04008ef946efba26b6c05e5994c1",
-      "preview_id": "REPLACE_WITH_PREVIEW_KV_ID"
+      "id": "23cf04008ef946efba26b6c05e5994c1"
     }
   ],
   "observability": {

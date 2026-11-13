@@ -7,16 +7,17 @@ import { dispatchOutbox } from "@/modules/notifications/outbox";
 
 /**
  * Cron sweep. Wired to a Cloudflare Cron Trigger in production.
- * Protected by CRON_SECRET when one is configured.
+ * Requires CRON_SECRET for every environment.
  */
 export async function POST(request: NextRequest) {
   try {
     const expected = secret("CRON_SECRET");
-    if (expected) {
-      const provided = request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
-      if (provided !== expected) {
-        return Response.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!expected) {
+      return Response.json({ error: "CRON_SECRET is not configured" }, { status: 503 });
+    }
+    const provided = request.headers.get("x-cron-secret") ?? request.nextUrl.searchParams.get("secret");
+    if (provided !== expected) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const db = await getDb();

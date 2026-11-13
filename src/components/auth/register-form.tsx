@@ -75,7 +75,7 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           minLength={2}
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          placeholder="Kavya Sharma"
+          placeholder="Full name"
           autoComplete="name"
         />
       </Field>
@@ -86,7 +86,7 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
+          placeholder="Email address"
           autoComplete="email"
         />
       </Field>
@@ -98,7 +98,7 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="Choose a strong password"
+          placeholder="Password"
           autoComplete="new-password"
         />
       </Field>
@@ -110,7 +110,7 @@ export function RegisterForm({ initialRole = "guest" }: { initialRole?: "guest" 
             required
             value={businessName}
             onChange={(event) => setBusinessName(event.target.value)}
-            placeholder="Coastal House Collection"
+            placeholder="Business name"
           />
         </Field>
       )}

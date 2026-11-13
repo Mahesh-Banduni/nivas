@@ -42,7 +42,7 @@ export function BecomeHostForm({ defaultName = "" }: { defaultName?: string }) {
           minLength={2}
           value={businessName}
           onChange={(event) => setBusinessName(event.target.value)}
-          placeholder="Coastal House Collection"
+          placeholder="Business name"
         />
       </Field>
       <Field label="A short introduction" htmlFor="bio" hint="Optional — tells guests how you look after the home.">
@@ -51,7 +51,7 @@ export function BecomeHostForm({ defaultName = "" }: { defaultName?: string }) {
           value={bio}
           onChange={(event) => setBio(event.target.value)}
           maxLength={600}
-          placeholder="We restored our family home in Siolim over three years…"
+          placeholder="Describe your hosting business"
         />
       </Field>
       <FormError>{error}</FormError>

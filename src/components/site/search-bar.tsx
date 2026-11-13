@@ -66,7 +66,7 @@ export function SearchBar({
             list="nivas-cities"
             value={city}
             onChange={(event) => setCity(event.target.value)}
-            placeholder="Goa, Jaipur, Manali…"
+            placeholder="Search by city"
             className="w-full pl-10 pr-4 py-2 border-0 bg-transparent text-[14px] text-ink placeholder:text-muted/60 focus:outline-none"
             autoComplete="off"
           />

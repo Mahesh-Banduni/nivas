@@ -57,7 +57,7 @@ export function MessageHost({
             rows={4}
             maxLength={2000}
             className="field resize-none text-[12px]"
-            placeholder="Ask the host about the home…"
+            placeholder="Write your question"
           />
           {error && <p className="mt-1.5 text-[11px] text-rose">{error}</p>}
           <div className="mt-2 flex items-center justify-between">

@@ -5,17 +5,15 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    default: "Nivas — stays with a story",
+    default: "Nivas",
     template: "%s · Nivas",
   },
-  description:
-    "A multi-vendor property marketplace: hand-picked villas, heritage homes and city apartments across India, with real-time availability, secure payments and host tools.",
+  description: "Property listings, bookings and host tools.",
   applicationName: "Nivas",
   authors: [{ name: "Nivas" }],
   openGraph: {
-    title: "Nivas — stays with a story",
-    description:
-      "Hand-picked villas, heritage homes and city apartments across India. Book with live availability and secure payments.",
+    title: "Nivas",
+    description: "Property listings, bookings and host tools.",
     type: "website",
   },
 };

@@ -1,8 +1,6 @@
 import { NextRequest } from "next/server";
 import { toErrorResponse } from "@/lib/errors";
 import { handleRazorpayWebhook } from "@/modules/payments/payment.service";
-import { secret } from "@/infrastructure/cloudflare/env";
-import { isDemoPayments } from "@/infrastructure/payments/razorpay";
 
 export const runtime = "nodejs";
 
@@ -31,10 +29,6 @@ export async function POST(request: NextRequest) {
       eventId: eventId?.slice(0, 16) + "...",
       bodyLength: rawBody.length,
     });
-
-    if (!isDemoPayments() && !secret("RAZORPAY_WEBHOOK_SECRET")) {
-      console.error(`[webhook:${requestId}] RAZORPAY_WEBHOOK_SECRET is not configured`);
-    }
 
     // Process webhook
     const result = await handleRazorpayWebhook(rawBody, signature, eventId);

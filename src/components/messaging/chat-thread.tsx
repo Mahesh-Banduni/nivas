@@ -141,7 +141,7 @@ export function ChatThread({
             }}
             rows={1}
             maxLength={2000}
-            placeholder="Write a message…"
+            placeholder="Message"
             className="field max-h-32 min-h-[42px] flex-1 resize-none py-2.5 text-[12.5px]"
           />
           <Button type="submit" disabled={pending || !body.trim()} className="h-[42px]">

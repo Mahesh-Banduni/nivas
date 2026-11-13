@@ -3,7 +3,6 @@ import path from "node:path";
 import { getCloudflareEnv, secret } from "@/infrastructure/cloudflare/env";
 
 const MEDIA_ROOT = path.join(process.cwd(), ".data", "media");
-const DEFAULT_BUCKET = "nivas-property-media";
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 const MAX_BYTES = 8 * 1024 * 1024;
 
@@ -40,7 +39,7 @@ async function getSupabaseStorageConfig(): Promise<SupabaseStorageConfig | null>
   const env = await getCloudflareEnv();
   const supabaseUrl = secret("SUPABASE_URL").trim();
   const serviceRoleKey = secret("SUPABASE_SERVICE_ROLE_KEY").trim();
-  const bucket = secret("SUPABASE_STORAGE_BUCKET", DEFAULT_BUCKET).trim() || DEFAULT_BUCKET;
+  const bucket = secret("SUPABASE_STORAGE_BUCKET").trim();
 
   if (!supabaseUrl && !serviceRoleKey) {
     if (env.APP_ENV === "production" || process.env.APP_ENV === "production") {
@@ -50,6 +49,9 @@ async function getSupabaseStorageConfig(): Promise<SupabaseStorageConfig | null>
   }
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error("Supabase Storage requires both SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
+  }
+  if (!bucket) {
+    throw new Error("Supabase Storage requires SUPABASE_STORAGE_BUCKET.");
   }
 
   const parsedUrl = new URL(supabaseUrl);

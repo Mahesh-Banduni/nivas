@@ -144,7 +144,7 @@ export default async function ModerationPage({
                             <input type="hidden" name="propertyId" value={item.id} />
                             <input type="hidden" name="decision" value="suspend" />
                             <label className="label" htmlFor={`suspend-${item.id}`}>Reason for the host</label>
-                            <textarea id={`suspend-${item.id}`} name="note" required rows={3} className="field text-[11.5px]" placeholder="Policy breach, inaccurate listing…" />
+                            <textarea id={`suspend-${item.id}`} name="note" required rows={3} className="field text-[11.5px]" placeholder="Reason for suspension" />
                             <Button type="submit" size="sm" variant="clay" className="w-full">
                               <Icon name="lock" size={13} /> Suspend listing
                             </Button>
@@ -162,7 +162,7 @@ export default async function ModerationPage({
                           <input type="hidden" name="propertyId" value={item.id} />
                           <input type="hidden" name="decision" value="reject" />
                           <label className="label" htmlFor={`reject-${item.id}`}>What needs fixing?</label>
-                          <textarea id={`reject-${item.id}`} name="note" required rows={3} className="field text-[11.5px]" placeholder="Add clearer photos of the bedroom…" />
+                          <textarea id={`reject-${item.id}`} name="note" required rows={3} className="field text-[11.5px]" placeholder="Requested changes" />
                           <Button type="submit" size="sm" variant="clay" className="w-full">
                             <Icon name="close" size={13} /> Send back to host
                           </Button>

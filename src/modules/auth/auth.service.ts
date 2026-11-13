@@ -180,9 +180,4 @@ export async function profileForUser(user: CurrentUser) {
   return { owner };
 }
 
-export async function ensureDemoRoles(userId: string, role: Role) {
-  const db = await getDb();
-  await insertRole(db, userId, role);
-}
-
 export { addDays };

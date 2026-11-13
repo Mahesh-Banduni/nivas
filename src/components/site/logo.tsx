@@ -11,7 +11,6 @@ export function Logo({ className = "" }: { className?: string }) {
         <span className="display text-[24px] tracking-[-0.04em] text-ink group-hover:text-gold-deep transition-colors">
           nivas
         </span>
-        <span className="mt-1 text-[8.5px] uppercase tracking-[0.24em] text-muted">stays with a story</span>
       </span>
     </Link>
   );

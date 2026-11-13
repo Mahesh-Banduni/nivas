@@ -41,10 +41,10 @@ declare global {
     CACHE?: KVNamespaceLike;
     BOOKING_QUEUE?: QueueProducerLike;
     APP_ENV?: string;
-    APP_URL?: string;
     SUPABASE_URL?: string;
     SUPABASE_SERVICE_ROLE_KEY?: string;
     SUPABASE_STORAGE_BUCKET?: string;
+    SUPPORT_EMAIL?: string;
   }
 
   // Populated by the OpenNext Cloudflare adapter at runtime.
@@ -83,11 +83,11 @@ export function runtimeName(): "cloudflare" | "local" {
   return globalThis.__nivasEnv ? "cloudflare" : "local";
 }
 
-export function secret(name: string, fallback = ""): string {
+export function secret(name: string): string {
   const env = cloudflareEnvSync();
   const fromEnv = Object.getOwnPropertyDescriptor(env, name)?.value as unknown;
   if (typeof fromEnv === "string" && fromEnv.length > 0) return fromEnv;
-  return process.env[name] ?? fallback;
+  return process.env[name] ?? "";
 }
 
 function cloudflareEnvSync(): CloudflareEnv {

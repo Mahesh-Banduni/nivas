@@ -6,7 +6,6 @@ import { Icon } from "@/components/ui/icon";
 import { logoutAction } from "@/app/actions";
 import type { CurrentUser } from "@/modules/auth/session";
 import { SidebarNav, type NavItem } from "./sidebar-nav";
-import { Badge } from "@/components/ui/badge";
 
 export function DashboardShell({
   user,
@@ -147,8 +146,4 @@ export function PageHeader({
       {children}
     </div>
   );
-}
-
-export function DemoBadge() {
-  return <Badge tone="gold">Demo data</Badge>;
 }

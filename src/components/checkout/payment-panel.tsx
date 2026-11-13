@@ -57,7 +57,6 @@ export function PaymentPanel({
   bookingId,
   total,
   expiresAt,
-  demo,
   guestName,
   guestEmail,
   guestPhone,
@@ -66,7 +65,6 @@ export function PaymentPanel({
   bookingId: string;
   total: number;
   expiresAt: string | null;
-  demo: boolean;
   guestName?: string;
   guestEmail?: string;
   guestPhone?: string;
@@ -133,21 +131,6 @@ export function PaymentPanel({
         throw new Error(session.error ?? "Could not start checkout. Please try again.");
       }
 
-      // Demo mode - simulate payment
-      if (session.demo) {
-        setPaymentStage("verifying");
-        const payResponse = await fetch(`/api/payments/${session.payment.id}/pay`, { method: "POST" });
-        const result = await payResponse.json();
-
-        if (!payResponse.ok) throw new Error(result.error ?? "Payment failed");
-        if (result.status === "needs_refund") throw new Error(result.message ?? "The hold expired before payment");
-
-        router.push(`/bookings/${bookingId}?paid=1`);
-        router.refresh();
-        return;
-      }
-
-      // Production mode - load Razorpay
       setPaymentStage("opening_checkout");
       await loadRazorpay();
 
@@ -285,24 +268,6 @@ export function PaymentPanel({
       >
         {stageLabels[paymentStage] || stageLabels.idle}
       </Button>
-
-      {/* Demo Mode Notice */}
-      {demo && !expired && (
-        <div className="rounded-xl bg-sand/50 border border-sand p-3">
-          <div className="flex items-start gap-2.5">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold-deep">
-              <Icon name="info" size={14} />
-            </div>
-            <div className="text-[12px] leading-relaxed text-ink-soft">
-              <p className="font-medium text-gold-deep">Demo Mode</p>
-              <p className="mt-0.5">
-                No Razorpay keys configured. The app signs a real HMAC callback and runs it through the same
-                verification and settlement path as production.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Error State */}
       {error && (

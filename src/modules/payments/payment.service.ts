@@ -2,12 +2,11 @@ import { getDb } from "@/db";
 import type { PaymentRow } from "@/db/types";
 import { nowIso } from "@/lib/date";
 import { AppError, badRequest, forbidden, notFound, unavailable } from "@/lib/errors";
-import { newId, randomToken } from "@/lib/ids";
+import { newId } from "@/lib/ids";
 import { computeQuote, formatINR } from "@/lib/money";
 import {
   createOrder,
-  isDemoPayments,
-  signDemoPayment,
+  isRazorpayConfigured,
   verifyPaymentSignature,
   verifyWebhookSignature,
 } from "@/infrastructure/payments/razorpay";
@@ -30,7 +29,6 @@ export interface CheckoutSession {
   amount: number;
   currency: string;
   keyId: string;
-  demo: boolean;
   expiresAt: string | null;
 }
 
@@ -94,17 +92,24 @@ export async function ensureCheckoutSession(userId: string, bookingId: string): 
         : "Your hold on these dates has expired. Please start a new reservation.",
     );
   }
+  if (!isRazorpayConfigured()) {
+    throw unavailable("Payments are not configured. Contact the site administrator.");
+  }
 
   const existing = await findLatestPaymentForBooking(db, booking.id);
-  if (existing && existing.provider_order_id && ["created", "pending", "authorized"].includes(existing.status)) {
+  if (
+    existing &&
+    existing.provider_order_id &&
+    !existing.provider_order_id.startsWith("order_demo_") &&
+    ["created", "pending", "authorized"].includes(existing.status)
+  ) {
     return {
       payment: existing,
       bookingId: booking.id,
       orderId: existing.provider_order_id,
       amount: existing.amount,
       currency: existing.currency,
-      keyId: isDemoPayments() ? "rzp_demo_nivas" : secret("RAZORPAY_KEY_ID"),
-      demo: isDemoPayments(),
+      keyId: secret("RAZORPAY_KEY_ID"),
       expiresAt: booking.hold_expires_at,
     };
   }
@@ -160,32 +165,8 @@ export async function ensureCheckoutSession(userId: string, bookingId: string): 
     amount: order.amount,
     currency: order.currency,
     keyId: order.keyId,
-    demo: order.demo,
     expiresAt: booking.hold_expires_at,
   };
-}
-
-/** Demo checkout: signs a callback exactly like Razorpay would, then verifies it. */
-export async function simulatePayment(userId: string, paymentId: string) {
-  const db = await getDb();
-  const payment = await findPaymentById(db, paymentId);
-  if (!payment) throw notFound("Payment not found");
-  const booking = await findBookingById(db, payment.booking_id);
-  if (!booking) throw notFound("Booking not found");
-  if (booking.guest_id !== userId) throw forbidden();
-  if (!payment.provider_order_id) throw badRequest("Payment order missing");
-
-  const providerPaymentId = `pay_demo_${randomToken(8)}`;
-  const signature = signDemoPayment(payment.provider_order_id, providerPaymentId);
-  if (!verifyPaymentSignature({ orderId: payment.provider_order_id, paymentId: providerPaymentId, signature })) {
-    throw badRequest("Signature verification failed");
-  }
-
-  return settlePayment({
-    paymentId: payment.id,
-    providerPaymentId,
-    method: "upi",
-  });
 }
 
 export interface SettleResult {
@@ -569,7 +550,7 @@ export async function createRefund(input: {
   amount: number;
   reason: string;
   notes?: Record<string, string>;
-}): Promise<{ refundId: string; demo: boolean }> {
+}): Promise<{ refundId: string }> {
   const db = await getDb();
   const payment = await findPaymentById(db, input.paymentId);
   if (!payment) throw notFound("Payment not found");
@@ -600,5 +581,5 @@ export async function createRefund(input: {
       .bind(now, payment.booking_id),
   ]);
 
-  return { refundId: result.refundId, demo: result.demo };
+  return { refundId: result.refundId };
 }

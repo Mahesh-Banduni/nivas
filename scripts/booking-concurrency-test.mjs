@@ -30,13 +30,13 @@ setup
     `INSERT INTO users (id, email, full_name, status, created_at, updated_at)
      VALUES (?, ?, ?, 'active', ?, ?)`,
   )
-  .run("usr_owner_test", "owner-test@nivas.test", "Test Host", now, now);
+  .run("usr_owner_test", "owner-test@example.invalid", "Test Host", now, now);
 setup
   .prepare(
     `INSERT INTO users (id, email, full_name, status, created_at, updated_at)
      VALUES (?, ?, ?, 'active', ?, ?)`,
   )
-  .run("usr_guest_test", "guest-test@nivas.test", "Test Guest", now, now);
+  .run("usr_guest_test", "guest-test@example.invalid", "Test Guest", now, now);
 setup
   .prepare(
     `INSERT INTO properties

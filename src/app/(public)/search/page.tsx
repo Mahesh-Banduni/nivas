@@ -315,7 +315,7 @@ function FilterForm({
             name="minPrice"
             min={0}
             step={500}
-            placeholder="Min"
+            placeholder="Minimum"
             defaultValue={minPrice ?? ""}
             aria-label="Minimum price"
           />
@@ -324,7 +324,7 @@ function FilterForm({
             name="maxPrice"
             min={0}
             step={500}
-            placeholder="Max"
+            placeholder="Maximum"
             defaultValue={maxPrice ?? ""}
             aria-label="Maximum price"
           />

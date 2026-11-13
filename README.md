@@ -1,13 +1,8 @@
 # Nivas — multi-vendor property marketplace
 
-A complete, production-shaped property marketplace: a public storefront, a guest
-booking experience, a host workspace and an admin console, built as a modular
-monolith on Next.js and designed for Cloudflare Workers (D1 and KV) with
-Supabase Storage for listing photos.
-
-The UI is fully realised — no placeholder screens. Listings use bespoke inline
-SVG artwork (no stock imagery) with a scene/tone system that stays crisp at every
-size.
+A property marketplace with a public storefront, guest booking experience, host
+workspace and admin console. It uses Next.js, Cloudflare Workers (D1 and KV),
+and Supabase Storage for listing photos.
 
 ---
 
@@ -23,7 +18,7 @@ size.
 | Cache | KV read cache for search, featured listings, destinations, amenities |
 | Async | Transactional outbox table; events are consumed inline |
 | Realtime | Conversation threads poll for updates |
-| Payments | Razorpay orders + signed, idempotent webhooks; built-in demo provider when keys are absent |
+| Payments | Razorpay orders + signed, idempotent webhooks; requires configured credentials |
 
 ---
 
@@ -36,37 +31,47 @@ npm run dev          # http://localhost:3000
 
 Requirements: Node 22.5+ (24 recommended — `node:sqlite` is used directly).
 
-On first request the app:
+On first request the app applies every `migrations/*.sql` file. No users,
+properties or other sample records are created.
 
-1. applies every `migrations/*.sql` file (all idempotent),
-2. seeds a rich demo marketplace when the database is empty.
-
-Reset everything with:
+Reset the local database and uploaded media with:
 
 ```bash
 npm run db:reset               # database + media
 npm run db:reset -- --keep-media
 ```
 
-### Demo accounts
+`db:reset` deletes all local database records and, unless `--keep-media` is
+passed, local uploaded media. Existing local or production records are not
+removed automatically.
 
-All demo passwords are `password123`.
+Create a new administrator account using environment variables (no default
+credentials are stored in the repository). Set `ADMIN_EMAIL`, `ADMIN_NAME`,
+and `ADMIN_PASSWORD` in the current terminal session or a secret manager; do
+not commit them or put them in `.env.example`.
 
-| Role | Email | Notes |
-| --- | --- | --- |
-| Guest | `kavya@nivas.test` | Upcoming trip, wishlist, conversations |
-| Host | `arjun@nivas.test` | Several homes, reservations, payouts |
-| Admin | `admin@nivas.test` | Moderation queue, users, ledger |
+```bash
+# Set ADMIN_EMAIL, ADMIN_NAME and ADMIN_PASSWORD in the current environment.
+npm run db:seed-admin             # local SQLite
+npm run db:seed-admin -- --remote # configured remote D1 database
+```
 
-Additional seeded guests and hosts exist for realistic queues and review data.
+For an existing account, promote it instead of creating another user:
+
+```bash
+npx wrangler d1 execute nivas-prod-db --remote --command "INSERT OR IGNORE INTO user_roles (user_id, role) SELECT id, 'admin' FROM users WHERE email = lower('your-account-email@example.com')"
+```
+
+The seed refuses to create a duplicate email and never resets an existing
+account's password. Apply remote migrations before running it with `--remote`.
 
 ---
 
 ## What to try
 
-1. **Search → property → hold → pay.** Pick dates on a listing, create a hold,
-   complete the demo payment, and land on the confirmation. The 15-minute hold
-   countdown is live on the checkout page.
+1. **Create marketplace data.** Register an account, add a host profile and
+   create a property. New listings need moderation before they appear in search.
+   Payment requires configured Razorpay credentials.
 2. **Double-booking is impossible.** Run `npm run test:booking`:
    two overlapping holds race; exactly one succeeds because
    `booking_nights` has `PRIMARY KEY (property_id, stay_date)` and each hold is
@@ -90,8 +95,8 @@ Additional seeded guests and hosts exist for realistic queues and review data.
 ```
 src/
   app/
-    (public)/          storefront: home, search, property, destinations, host CTA
-    (auth)/            split-screen login + register
+    (public)/          storefront: home, search, property, destinations, host setup
+    (auth)/            login + register
     (guest)/           trips, checkout, wishlist, messages, account
     owner/             host workspace (shell + server actions)
     admin/             admin console
@@ -105,8 +110,8 @@ src/
     media-storage.ts   Supabase Storage adapter and local filesystem fallback
     payments/          Razorpay client (order, verify, refund)
     notifications/     email + SMS providers
-  components/          UI kit, property art, site chrome, dashboard shell
-  db/                  database interface, local adapter, schema mirror, seed
+  components/          UI kit, image display, site chrome, dashboard shell
+  db/                  database interface, local adapter, schema mirror
 migrations/0001_init.sql   canonical DDL (D1 migrations directory)
 scripts/                   reset + concurrency test
 wrangler.jsonc             Cloudflare Worker, D1 and KV bindings
@@ -123,7 +128,7 @@ exercised by the local adapter and D1.
 
 `src/db/index.ts` boots `LocalDatabase` (node:sqlite) behind a D1-compatible
 `prepare/bind/all/first/run/batch` interface. `D1Adapter` implements the same
-interface in production. Everything above the adapter is portable.
+interface in production. Neither adapter inserts sample records.
 
 ---
 
@@ -168,15 +173,10 @@ notifications exactly once.
 
 ## Payments
 
-Set both `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to create real Razorpay
-orders. If either is blank, checkout uses the **demo provider**:
-
-1. checkout creates an order (real rows in `payments`),
-2. the demo button calls `/api/payments/[id]/pay`, which signs an HMAC callback
-   with the same secret used in production and feeds it through
-   `handleRazorpayWebhook()`,
-3. signature verification, event dedupe (`payment_events` unique key) and
-   `settlePayment()` run identically to a live webhook.
+Set both `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to enable checkout. Without
+them, checkout reports that payments are unavailable; it never creates
+simulated orders or confirmations. Configure `RAZORPAY_WEBHOOK_SECRET` before
+accepting production payments.
 
 Refunds follow the listing policy and are recorded against the payment, never by
 mutating history.
@@ -242,8 +242,7 @@ object keys before switching the app.
 npx wrangler d1 create nivas-prod-db
 npx wrangler kv namespace create CACHE
 
-# Copy the returned database_id and namespace id values into wrangler.jsonc,
-# and replace APP_URL with your public domain before deploying.
+# Copy the returned database_id and namespace id values into wrangler.jsonc.
 npx wrangler d1 migrations apply nivas-prod-db --remote
 npx wrangler d1 migrations apply nivas-prod-db --local
 npm run cf:preview
@@ -259,12 +258,22 @@ After the first deploy creates the Worker, set secrets:
 ```bash
 npx wrangler secret put SUPABASE_URL
 npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-npx wrangler secret put SESSION_SECRET
+npx wrangler secret put SUPABASE_STORAGE_BUCKET
 npx wrangler secret put RAZORPAY_KEY_ID
 npx wrangler secret put RAZORPAY_KEY_SECRET
 npx wrangler secret put RAZORPAY_WEBHOOK_SECRET
 npx wrangler secret put CRON_SECRET
+```
+
+Set these additional secrets only if the corresponding optional integrations
+are enabled:
+
+```bash
 npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put EMAIL_FROM
+npx wrangler secret put SMS_API_KEY
+npx wrangler secret put SMS_GATEWAY_URL
+npx wrangler secret put SUPPORT_EMAIL
 ```
 
 Use an authenticated external scheduler to call `POST /api/cron/tick` with the
@@ -272,8 +281,8 @@ Use an authenticated external scheduler to call `POST /api/cron/tick` with the
 
 OpenNext reads bindings from the request's Cloudflare context. D1 is selected
 instead of the local SQLite adapter when the `DB` binding is present. Local
-`npm run dev` keeps the SQLite/demo database by default; set
-`NIVAS_USE_CLOUDFLARE=true` to exercise Wrangler's local bindings. Queue
+`npm run dev` uses SQLite with no seeded records; set `NIVAS_USE_CLOUDFLARE=true`
+to exercise Wrangler's local bindings. Queue
 consumers, Durable Object chat and scheduled Worker handlers are not enabled in
 this deployment configuration.
 
@@ -286,7 +295,8 @@ this deployment configuration.
 | `npm run dev` | Local dev server |
 | `npm run build` / `npm start` | Production build / serve |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run db:reset` | Delete local DB + media, then re-seed on next boot |
+| `npm run db:reset` | Destructively delete local DB + media; migrations run on next boot |
+| `npm run db:seed-admin` | Create an administrator from `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` |
 | `npm run test:booking` | Race two overlapping holds; expects exactly one winner |
 | `npm run cf:build` | OpenNext Cloudflare build |
 | `npm run cf:preview` | Build and preview in the Workers runtime |
@@ -296,12 +306,18 @@ this deployment configuration.
 
 ## Environment
 
-Copy `.env.example` to `.env.local`. Everything has a safe local fallback:
+Copy `.env.example` to `.env.local` and set credentials for integrations you
+intend to use:
 
-- `SESSION_SECRET` — session token hashing (rotate in production)
-- `RAZORPAY_*` — blank keys switch to the demo provider
-- `CRON_SECRET` — protects `/api/cron/tick`
-- `EMAIL_FROM`, `RESEND_API_KEY`, `SMS_API_KEY` — notification providers
+- `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` — required
+  to accept and verify payments
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` —
+  required for production media storage
+- `CRON_SECRET` — required to call `/api/cron/tick`
+- `EMAIL_FROM`, `RESEND_API_KEY`, `SMS_GATEWAY_URL`, `SMS_API_KEY` — optional
+  notification providers; sender/gateway values are required when their API
+  keys are set
+- `SUPPORT_EMAIL` — optional customer support contact
 - `NIVAS_DB_PATH` — optional override for the local SQLite file
 
 ---
@@ -319,10 +335,9 @@ dots.
 
 ## Notes & boundaries
 
-- Payment, email and SMS providers are behind interfaces; demo mode is explicit
-  and visible in the UI.
+- Payment, email and SMS providers are behind interfaces; payment is disabled
+  until the Razorpay credentials are configured.
 - Local development uses SQLite and filesystem storage; the Cloudflare Worker
   uses D1 and KV bindings. Queues, Durable Object chat and scheduled Worker
   handlers are not enabled in the current deployment configuration.
-- Listing imagery is generated SVG, so the repository contains no binary assets
-  and no external image dependencies.
+- Listings without uploaded photos do not display a generated illustration.

@@ -92,7 +92,7 @@ export function ReviewForm({ bookingId }: { bookingId: string }) {
           maxLength={2000}
           value={comment}
           onChange={(event) => setComment(event.target.value)}
-          placeholder="The courtyard is even better than the photos…"
+          placeholder="Write your review"
         />
       </Field>
 

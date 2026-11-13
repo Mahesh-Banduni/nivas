@@ -43,10 +43,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   await recordPropertyView(property.id);
   const saved = user ? await savedPropertyIds(user.id) : [];
   const dates = suggestedDates();
-  const galleryKeys = property.images.length
-    ? property.images.map((image) => image.r2_key)
-    : Array.from({ length: 5 }, (_, index) => `seed/${property.property_type}/${index + 1}`);
-
   const description = (property.description ?? "").split("\n").filter(Boolean);
   const ratingBuckets = [5, 4, 3, 2, 1].map((stars) => ({
     stars,
@@ -124,30 +120,31 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* gallery */}
-      <div className="mt-6 grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-[420px]">
-        <div className="relative col-span-4 row-span-2 overflow-hidden bg-sand sm:col-span-2">
-          <ArtImage mediaKey={galleryKeys[0]} type={property.property_type} alt={property.title} priority className="h-full w-full" />
-          <span className="absolute bottom-3 left-3 rounded-full bg-cream/90 px-3 py-1 text-[10.5px] text-ink backdrop-blur">
-            {property.images.length ? `${property.images.length} photos` : "Illustrated preview"}
-          </span>
+      {property.images.length > 0 ? (
+        <div className="mt-6 grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-[420px]">
+          {property.images.slice(0, 5).map((image, index) => (
+            <div
+              key={image.id}
+              className={`relative overflow-hidden bg-sand ${
+                index === 0
+                  ? "col-span-4 row-span-2 sm:col-span-2"
+                  : "hidden sm:block"
+              }`}
+            >
+              <ArtImage
+                mediaKey={image.r2_key}
+                url={image.url}
+                type={property.property_type}
+                alt={image.alt ?? property.title}
+                priority={index === 0}
+                className="h-full w-full"
+              />
+            </div>
+          ))}
         </div>
-        {galleryKeys.slice(1, 5).map((key, index) => (
-          <div key={key} className="relative hidden overflow-hidden bg-sand sm:block">
-            <ArtImage
-              mediaKey={key}
-              type={property.property_type}
-              alt={`${property.title} view ${index + 2}`}
-              className="h-full w-full"
-            />
-            {index === 3 && (
-              <span className="absolute inset-0 flex items-center justify-center bg-ink/30 text-[11px] font-medium uppercase tracking-[0.14em] text-cream">
-                View gallery
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
+      ) : (
+        <p className="surface-quiet mt-6 p-5 text-[13px] text-muted">No photos uploaded.</p>
+      )}
 
       <div className="mt-9 grid gap-12 lg:grid-cols-[1fr_368px]">
         <div className="min-w-0">
@@ -189,9 +186,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {[
                 { icon: "home" as const, title: typeLabel(property.property_type), body: `${property.bedrooms} bedrooms · ${property.beds} beds · ${property.bathrooms} baths` },
-                { icon: "guests" as const, title: `Sleeps ${property.max_guests}`, body: "Thoughtfully set up for families and small groups" },
+                { icon: "guests" as const, title: `Sleeps ${property.max_guests}`, body: "Maximum guest capacity" },
                 { icon: "clock" as const, title: `${property.rules?.check_in_time ?? "14:00"} check-in`, body: `Check-out by ${property.rules?.check_out_time ?? "11:00"}` },
-                { icon: "star" as const, title: property.featured ? "Guest favourite" : "Hand-picked home", body: "Reviewed and approved by the Nivas team" },
+                ...(property.featured ? [{ icon: "star" as const, title: "Featured listing", body: "Highlighted by the platform" }] : []),
               ].map((item) => (
                 <div key={item.title} className="flex gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sand text-pine">
@@ -207,16 +204,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
           </div>
 
           {/* description */}
-          <div className="border-b border-line py-7">
+          {description.length > 0 && <div className="border-b border-line py-7">
             <h2 className="font-display text-[24px] text-ink">About this home</h2>
             <div className="mt-3 space-y-3 text-[13.5px] leading-[1.75] text-ink-soft">
-              {description.length ? (
-                description.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-              ) : (
-                <p>{property.description ?? "A hand-picked home in a quiet part of town."}</p>
-              )}
+              {description.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
             </div>
-          </div>
+          </div>}
 
           {/* amenities */}
           <div className="border-b border-line py-7">
@@ -254,9 +247,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 <p className="text-[12.5px] leading-relaxed text-ink-soft">
                   {cancellationCopy(property.rules?.cancellation_policy)}
                 </p>
-                <Link href="/how-it-works#trust" className="mt-3 inline-flex items-center gap-1 text-[11.5px] text-pine hover:underline">
-                  How refunds work <Icon name="arrow-up-right" size={12} />
-                </Link>
               </div>
             </div>
           </div>

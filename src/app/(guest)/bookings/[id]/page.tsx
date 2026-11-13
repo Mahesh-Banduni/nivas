@@ -14,6 +14,7 @@ import { formatINR } from "@/lib/money";
 import { titleCase } from "@/lib/labels";
 import { requireUser } from "@/modules/auth/session";
 import { getBookingForUser, getBookingTimeline } from "@/modules/bookings/booking.service";
+import { secret } from "@/infrastructure/cloudflare/env";
 
 export const metadata: Metadata = { title: "Booking details" };
 
@@ -27,6 +28,7 @@ export default async function BookingDetailPage({
   const { id } = await params;
   const query = await searchParams;
   const user = await requireUser(`/bookings/${id}`);
+  const supportEmail = secret("SUPPORT_EMAIL").trim();
   const booking = await getBookingForUser(user.id, user.roles, id);
   if (!booking) notFound();
 
@@ -282,13 +284,13 @@ export default async function BookingDetailPage({
             </p>
           </div>
 
-          <div className="surface p-5">
+          {supportEmail && <div className="surface p-5">
             <p className="eyebrow mb-2">Need help?</p>
             <p className="text-[11.5px] leading-relaxed text-muted">
-              Write to <span className="text-ink">support@nivas.test</span> with booking {booking.code}.
+              Write to <a href={`mailto:${supportEmail}`} className="text-ink underline">{supportEmail}</a> with booking {booking.code}.
               The platform team can see the payment and audit trail.
             </p>
-          </div>
+          </div>}
         </aside>
       </div>
     </div>

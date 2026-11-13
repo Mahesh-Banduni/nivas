@@ -80,7 +80,7 @@ export async function handleDomainEvent(db: Database, event: QueueEvent) {
         await sendEmail({
           to: email,
           subject: "Welcome to Nivas",
-          html: `<p>Hi ${name},</p><p>Your Nivas account is ready. Explore hand-picked stays across India.</p>`,
+          html: `<p>Hi ${name},</p><p>Your Nivas account is ready. Explore available stays.</p>`,
         });
       }
       break;

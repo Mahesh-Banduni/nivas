@@ -3,7 +3,7 @@ import { getCloudflareDb } from "@/infrastructure/cloudflare/env";
 
 /**
  * Selects D1 when an OpenNext Cloudflare binding is available; otherwise
- * initializes the local SQLite database and demo seed.
+ * initializes the local SQLite database.
  *
  * Production D1 migrations are applied separately with Wrangler.
  */
@@ -18,11 +18,10 @@ async function init(): Promise<Database> {
   if (cloudflareDb) return cloudflareDb;
 
   if (!globalForDb.__nivasDb) {
-    const [{ LocalDatabase }, fs, path, { seedDatabase }] = await Promise.all([
+    const [{ LocalDatabase }, fs, path] = await Promise.all([
       import("./local-sqlite"),
       import("node:fs"),
       import("node:path"),
-      import("./seed"),
     ]);
     const databaseFile = process.env.NIVAS_DB_PATH ?? path.join(process.cwd(), ".data", "nivas.db");
     const db = new LocalDatabase(databaseFile);
@@ -37,7 +36,6 @@ async function init(): Promise<Database> {
       db.raw().exec(sql);
     }
     globalForDb.__nivasDb = db;
-    await seedDatabase(db);
   }
   return globalForDb.__nivasDb;
 }

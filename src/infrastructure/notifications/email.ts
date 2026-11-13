@@ -7,11 +7,13 @@ export async function sendEmail(input: { to: string; subject: string; html: stri
     console.info(`[email:console] to=${input.to} subject="${input.subject}"`);
     return { delivered: false, provider: "console" as const };
   }
+  const from = secret("EMAIL_FROM");
+  if (!from) throw new Error("EMAIL_FROM must be configured when RESEND_API_KEY is set.");
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
-      from: secret("EMAIL_FROM", "stays@nivas.example"),
+      from,
       to: input.to,
       subject: input.subject,
       html: input.html,
