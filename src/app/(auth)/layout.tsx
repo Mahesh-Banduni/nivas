@@ -46,7 +46,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
         <div className="relative z-10 flex items-center gap-3 border-t border-cream/15 px-10 py-5 text-[11px] text-cream/50">
           <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-          D1 · R2 · KV · Workers
+          D1 · Supabase Storage · KV · Workers
         </div>
       </div>
 

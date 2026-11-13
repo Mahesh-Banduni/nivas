@@ -32,7 +32,7 @@ const HOST_STEPS = [
   {
     icon: "home" as const,
     title: "Create your listing",
-    body: "Set the home's character, capacity, amenities, house rules and cancellation policy. Upload photos straight to R2.",
+    body: "Set the home's character, capacity, amenities, house rules and cancellation policy. Upload photos straight to Supabase Storage.",
   },
   {
     icon: "shield" as const,
@@ -187,7 +187,7 @@ export default function HowItWorksPage() {
             {[
               ["Next.js App Router", "Server components render the marketplace; route handlers expose bookings, payments, chat and uploads."],
               ["Cloudflare D1", "Transactional SQL with batched writes. Booking nights are unique per property and date."],
-              ["Cloudflare storage", "Private media uses R2, while KV caches public discovery reads. Booking events are stored in the transactional outbox."],
+              ["Cloudflare + Supabase", "Private media uses Supabase Storage, while Cloudflare KV caches public discovery reads. Booking events are stored in the transactional outbox."],
               ["Secure messaging", "Conversation membership is checked on every request; threads refresh automatically while you chat."],
             ].map(([title, body]) => (
               <div key={title} className="border-t border-cream/20 pt-4">

@@ -1,4 +1,4 @@
-import { getObject, isSafeKey } from "@/infrastructure/cloudflare/r2";
+import { getObject, isSafeKey } from "@/infrastructure/media-storage";
 
 export async function GET(_request: Request, ctx: { params: Promise<{ key: string[] }> }) {
   const { key } = await ctx.params;

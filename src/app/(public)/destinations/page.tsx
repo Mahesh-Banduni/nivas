@@ -52,7 +52,7 @@ export default async function DestinationsPage() {
             >
               <div className={index % 5 === 0 ? "aspect-[21/9]" : "aspect-[16/10]"}>
                 <ArtImage
-                  r2Key={destination.cover_key}
+                  mediaKey={destination.cover_key}
                   url={destination.cover_url}
                   alt={`${destination.city} stays`}
                   priority={index === 0}

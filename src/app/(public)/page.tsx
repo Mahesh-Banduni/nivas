@@ -121,7 +121,7 @@ export default async function HomePage() {
                   <div className="aspect-[4/3]">
                     <ArtImage
                       url={hero.cover_url}
-                      r2Key={hero.cover_key}
+                      mediaKey={hero.cover_key}
                       type={hero.property_type}
                       alt={hero.title}
                       priority
@@ -159,7 +159,7 @@ export default async function HomePage() {
                   <div className="aspect-[5/4]">
                     <ArtImage
                       url={hero.cover_url}
-                      r2Key={hero.cover_key}
+                      mediaKey={hero.cover_key}
                       type={hero.property_type}
                       alt={hero.title}
                       priority
@@ -188,7 +188,7 @@ export default async function HomePage() {
                   <div className="aspect-[4/3]">
                     <ArtImage
                       url={secondary.cover_url}
-                      r2Key={secondary.cover_key}
+                      mediaKey={secondary.cover_key}
                       type={secondary.property_type}
                       alt={secondary.title}
                       className="h-full w-full transition duration-700 group-hover:scale-105"
@@ -269,7 +269,7 @@ export default async function HomePage() {
               >
                 <div className="aspect-[16/9]">
                   <ArtImage
-                    r2Key={destination.cover_key}
+                    mediaKey={destination.cover_key}
                     url={destination.cover_url}
                     alt={`${destination.city} stays`}
                     className="h-full w-full transition duration-[900ms] group-hover:scale-[1.05]"
@@ -302,8 +302,8 @@ export default async function HomePage() {
               Built like a hotel. Feels like a home.
             </h2>
             <p className="mt-3 max-w-md text-[13.5px] leading-relaxed text-muted">
-              The marketplace runs on Cloudflare&apos;s edge: D1 for transactional data, R2 for
-              photos and KV for discovery caching. Guests get speed; hosts get reliability.
+              The marketplace runs on Cloudflare&apos;s edge: D1 for transactional data, Supabase
+              Storage for photos and KV for discovery caching. Guests get speed; hosts get reliability.
             </p>
             <ButtonLink href="/how-it-works" className="mt-6">
               How it works <Icon name="arrow-right" size={15} />

@@ -127,7 +127,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
       {/* gallery */}
       <div className="mt-6 grid h-[300px] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl sm:h-[420px]">
         <div className="relative col-span-4 row-span-2 overflow-hidden bg-sand sm:col-span-2">
-          <ArtImage r2Key={galleryKeys[0]} type={property.property_type} alt={property.title} priority className="h-full w-full" />
+          <ArtImage mediaKey={galleryKeys[0]} type={property.property_type} alt={property.title} priority className="h-full w-full" />
           <span className="absolute bottom-3 left-3 rounded-full bg-cream/90 px-3 py-1 text-[10.5px] text-ink backdrop-blur">
             {property.images.length ? `${property.images.length} photos` : "Illustrated preview"}
           </span>
@@ -135,7 +135,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
         {galleryKeys.slice(1, 5).map((key, index) => (
           <div key={key} className="relative hidden overflow-hidden bg-sand sm:block">
             <ArtImage
-              r2Key={key}
+              mediaKey={key}
               type={property.property_type}
               alt={`${property.title} view ${index + 2}`}
               className="h-full w-full"

@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nivas-marketplace",
+  "name": "nivas",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-09-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -10,7 +10,8 @@
   },
   "vars": {
     "APP_ENV": "production",
-    "APP_URL": "https://nivas.example"
+    "APP_URL": "https://nivas.example",
+    "SUPABASE_STORAGE_BUCKET": "nivas-property-media"
   },
   "services": [
     {
@@ -24,13 +25,6 @@
       "database_name": "nivas-prod-db",
       "database_id": "648547b6-b20a-4ab6-b351-657f71f2935f",
       "migrations_dir": "migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "PROPERTY_MEDIA",
-      "bucket_name": "nivas-property-media",
-      "preview_bucket_name": "nivas-property-media-preview"
     }
   ],
   "kv_namespaces": [

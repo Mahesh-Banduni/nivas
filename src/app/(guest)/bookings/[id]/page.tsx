@@ -144,7 +144,7 @@ export default async function BookingDetailPage({
         <div className="space-y-5">
           <div className="surface overflow-hidden">
             <div className="relative h-44 sm:h-52">
-              <ArtImage r2Key={booking.cover_key} url={booking.cover_url} type={booking.property_type} alt={booking.property_title} className="h-full w-full" />
+              <ArtImage mediaKey={booking.cover_key} url={booking.cover_url} type={booking.property_type} alt={booking.property_title} className="h-full w-full" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4">
                 <p className="text-[10px] uppercase tracking-[0.16em] text-cream/65">{copy.title}</p>

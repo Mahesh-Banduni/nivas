@@ -365,7 +365,7 @@ export function PropertyForm({
         <div className="surface p-5">
           <h2 className="font-display text-[19px] text-ink">Photos</h2>
           <p className="mt-1 text-[11px] leading-relaxed text-muted">
-            JPEG, PNG, WebP or AVIF, up to 8 MB each. Uploads go straight from the browser to R2
+            JPEG, PNG, WebP or AVIF, up to 8 MB each. Uploads go straight from the browser to Supabase Storage
             with a short-lived presigned URL — the API only issues the signature.
           </p>
 
@@ -390,7 +390,7 @@ export function PropertyForm({
                 {images.map((image) => (
                   <div key={image.id} className="group relative overflow-hidden rounded-lg border border-line bg-sand">
                     <div className="aspect-[4/3]">
-                      <ArtImage r2Key={image.r2_key} url={image.url} alt={image.alt ?? "Listing photo"} className="h-full w-full" />
+                      <ArtImage mediaKey={image.r2_key} url={image.url} alt={image.alt ?? "Listing photo"} className="h-full w-full" />
                     </div>
                     <button
                       type="button"

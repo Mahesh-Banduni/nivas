@@ -3,7 +3,7 @@ import { getDb } from "@/db";
 import { badRequest, forbidden, notFound, toErrorResponse } from "@/lib/errors";
 import { newId } from "@/lib/ids";
 import { requireApiUser } from "@/modules/auth/session";
-import { createPresignedUpload, isAllowedImageType, maxUploadBytes } from "@/infrastructure/cloudflare/r2";
+import { createPresignedUpload, isAllowedImageType, maxUploadBytes } from "@/infrastructure/media-storage";
 
 const EXTENSIONS: Record<string, string> = {
   "image/jpeg": "jpg",

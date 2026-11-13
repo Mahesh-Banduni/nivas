@@ -4,7 +4,7 @@ import { nowIso } from "@/lib/date";
 import { badRequest, forbidden, notFound, toErrorResponse } from "@/lib/errors";
 import { newId } from "@/lib/ids";
 import { requireApiUser } from "@/modules/auth/session";
-import { deleteObject, isSafeKey } from "@/infrastructure/cloudflare/r2";
+import { deleteObject, isSafeKey } from "@/infrastructure/media-storage";
 import { invalidate } from "@/infrastructure/cloudflare/kv";
 
 async function requireOwner(propertyId: string, userId: string, roles: string[]) {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
         imageId,
         id,
         key,
-        body.url ?? null,
+        body.url ?? `/api/media/${key}`,
         body.alt ?? null,
         (existing?.position ?? -1) + 1,
         nowIso(),
@@ -83,8 +83,8 @@ export async function DELETE(request: NextRequest, ctx: { params: Promise<{ id: 
       .bind(imageId, id)
       .first<{ r2_key: string }>();
     if (!image) throw notFound("Photo not found");
+    await deleteObject(image.r2_key);
     await db.prepare("DELETE FROM property_images WHERE id = ? AND property_id = ?").bind(imageId, id).run();
-    await deleteObject(image.r2_key).catch(() => undefined);
     await invalidate("search:");
     return Response.json({ ok: true });
   } catch (error) {

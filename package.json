@@ -2,7 +2,7 @@
   "name": "nivas-property-marketplace",
   "version": "1.0.0",
   "private": true,
-  "description": "Nivas — a multi-vendor property booking marketplace built with Next.js, D1-style SQLite, R2-style media storage and queue-backed jobs.",
+  "description": "Nivas — a multi-vendor property booking marketplace built with Next.js, D1-style SQLite, Supabase Storage and queue-backed jobs.",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { badRequest, toErrorResponse } from "@/lib/errors";
-import { decodeLocalUploadToken, isAllowedImageType, looksLikeImage, maxUploadBytes, putObject } from "@/infrastructure/cloudflare/r2";
+import { decodeLocalUploadToken, isAllowedImageType, looksLikeImage, maxUploadBytes, putObject } from "@/infrastructure/media-storage";
 
-/** Local stand-in for an R2 presigned PUT. Same method, same shape. */
+/** Local stand-in for a Supabase signed PUT. Same method, same shape. */
 export async function PUT(request: NextRequest) {
   try {
     const token = request.nextUrl.searchParams.get("token");

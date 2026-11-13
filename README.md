@@ -2,7 +2,8 @@
 
 A complete, production-shaped property marketplace: a public storefront, a guest
 booking experience, a host workspace and an admin console, built as a modular
-monolith on Next.js and designed for Cloudflare (D1, R2 and KV).
+monolith on Next.js and designed for Cloudflare Workers (D1 and KV) with
+Supabase Storage for listing photos.
 
 The UI is fully realised — no placeholder screens. Listings use bespoke inline
 SVG artwork (no stock imagery) with a scene/tone system that stays crisp at every
@@ -18,7 +19,7 @@ size.
 | Styling | Tailwind CSS v4 with `@theme` tokens in `src/app/globals.css` |
 | Database | D1-style SQLite. Local adapter uses `node:sqlite` (zero native deps) |
 | ORM | Drizzle schema mirror for typing/migrations; repositories use parameterised SQL so the same code runs on D1 |
-| Media | R2 with browser-direct presigned PUT uploads (SigV4 signed in-process) |
+| Media | Private Supabase Storage bucket with browser-direct signed PUT uploads |
 | Cache | KV read cache for search, featured listings, destinations, amenities |
 | Async | Transactional outbox table; events are consumed inline |
 | Realtime | Conversation threads poll for updates |
@@ -72,7 +73,7 @@ Additional seeded guests and hosts exist for realistic queues and review data.
    written as one atomic batch.
 3. **Guest workspace.** `/bookings` (upcoming/past tabs, cancel, review),
    `/wishlist`, `/messages` (5s polling, read receipts), `/account`.
-4. **Host workspace.** `/owner` overview, listings CRUD with browser-to-R2
+4. **Host workspace.** `/owner` overview, listings CRUD with browser-to-Supabase
    uploads, reservations with cancellation, month calendar with block dates,
    earnings and payouts.
 5. **Admin console.** `/admin` health, moderation (approve / request changes /
@@ -100,14 +101,15 @@ src/
                        payments, messaging, reviews, wishlist, notifications,
                        admin, owners)
   infrastructure/
-    cloudflare/        D1 adapter, KV, R2 SigV4 presigning and OpenNext bindings
+    cloudflare/        D1 adapter, KV and OpenNext bindings
+    media-storage.ts   Supabase Storage adapter and local filesystem fallback
     payments/          Razorpay client (order, verify, refund)
     notifications/     email + SMS providers
   components/          UI kit, property art, site chrome, dashboard shell
   db/                  database interface, local adapter, schema mirror, seed
 migrations/0001_init.sql   canonical DDL (D1 migrations directory)
 scripts/                   reset + concurrency test
-wrangler.jsonc             Cloudflare Worker, D1, R2 and KV bindings
+wrangler.jsonc             Cloudflare Worker, D1 and KV bindings
 ```
 
 ### Modular monolith
@@ -203,14 +205,15 @@ webhook secret.
 ## Media uploads
 
 1. Browser asks `/api/uploads/presign` for a target,
-2. server validates property ownership, MIME, size and returns a short-lived
-   presigned PUT (R2 SigV4) — or a local upload token in development,
-3. browser PUTs directly to R2,
+2. server validates property ownership, MIME and requested size, then returns a
+   Supabase signed upload URL — or a local upload token in development,
+3. browser PUTs directly to Supabase Storage,
 4. `/api/properties/[id]/images` verifies the object (magic-byte sniffing) and
    attaches it.
 
-The API never proxies image bytes in production. The local adapter writes to
-`.data/media` and serves through `/api/media/[...key]`.
+Production uploads go directly from the browser to Supabase Storage using a
+signed URL. The private bucket is read through `/api/media/[...key]`; local
+development writes to `.data/media` and serves through the same route.
 
 ---
 
@@ -223,11 +226,20 @@ polled every 5 seconds in the UI and mark unread messages as read.
 
 ## Cloudflare deployment
 
-Prerequisites: a Cloudflare account with Workers, R2, D1 and KV enabled.
+Prerequisites: a Cloudflare account with Workers, D1 and KV enabled, plus a
+Supabase project with a private Storage bucket named `nivas-property-media`.
+
+Create the private bucket in Supabase Storage, allow the image MIME types used
+by the app, and set its maximum object size to 8 MB. Store the project URL and
+service-role key as Wrangler secrets; never expose the service-role key to the
+browser.
+
+Existing objects are not copied from the old R2 bucket automatically. If it
+contains listing photos, migrate them to the Supabase bucket using the same
+object keys before switching the app.
 
 ```bash
 npx wrangler d1 create nivas-prod-db
-npx wrangler r2 bucket create nivas-property-media
 npx wrangler kv namespace create CACHE
 
 # Copy the returned database_id and namespace id values into wrangler.jsonc,
@@ -242,24 +254,21 @@ The remote migration prepares production D1. The separate local migration
 prepares Wrangler's local D1 used by `cf:preview`; apply it again whenever new
 migration files are added.
 
-Set secrets:
+After the first deploy creates the Worker, set secrets:
 
 ```bash
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 npx wrangler secret put SESSION_SECRET
 npx wrangler secret put RAZORPAY_KEY_ID
 npx wrangler secret put RAZORPAY_KEY_SECRET
 npx wrangler secret put RAZORPAY_WEBHOOK_SECRET
 npx wrangler secret put CRON_SECRET
 npx wrangler secret put RESEND_API_KEY
-npx wrangler secret put R2_ACCOUNT_ID
-npx wrangler secret put R2_ACCESS_KEY_ID
-npx wrangler secret put R2_SECRET_ACCESS_KEY
 ```
 
 Use an authenticated external scheduler to call `POST /api/cron/tick` with the
 `x-cron-secret` header. The route itself is idempotent.
-
-R2 CORS must allow `PUT` from `APP_URL` with `content-type` headers.
 
 OpenNext reads bindings from the request's Cloudflare context. D1 is selected
 instead of the local SQLite adapter when the `DB` binding is present. Local
@@ -313,7 +322,7 @@ dots.
 - Payment, email and SMS providers are behind interfaces; demo mode is explicit
   and visible in the UI.
 - Local development uses SQLite and filesystem storage; the Cloudflare Worker
-  uses D1, R2 and KV bindings. Queues, Durable Object chat and scheduled Worker
+  uses D1 and KV bindings. Queues, Durable Object chat and scheduled Worker
   handlers are not enabled in the current deployment configuration.
 - Listing imagery is generated SVG, so the repository contains no binary assets
   and no external image dependencies.

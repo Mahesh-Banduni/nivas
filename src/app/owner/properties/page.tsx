@@ -73,7 +73,7 @@ export default async function OwnerPropertiesPage() {
                   <div className="flex items-center gap-3">
                     <div className="h-11 w-14 shrink-0 overflow-hidden rounded-md bg-sand">
                       <ArtImage
-                        r2Key={listing.cover_key}
+                        mediaKey={listing.cover_key}
                         url={listing.cover_url}
                         type={listing.property_type}
                         alt={listing.title}

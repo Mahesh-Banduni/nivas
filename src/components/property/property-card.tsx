@@ -30,7 +30,7 @@ export function PropertyCard({
         >
           <ArtImage
             url={property.cover_url}
-            r2Key={property.cover_key}
+            mediaKey={property.cover_key}
             type={property.property_type}
             alt={property.title}
             className="h-full w-full transition duration-700 group-hover:scale-[1.04]"
@@ -80,7 +80,7 @@ export function PropertyCard({
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-sand">
           <ArtImage
             url={property.cover_url}
-            r2Key={property.cover_key}
+            mediaKey={property.cover_key}
             type={property.property_type}
             alt={property.title}
             priority={priority}

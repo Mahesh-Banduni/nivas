@@ -25,12 +25,6 @@ export interface D1DatabaseLike {
   exec(sql: string): Promise<unknown>;
 }
 
-export interface R2BucketLike {
-  put(key: string, value: ArrayBuffer | Uint8Array | string, options?: Record<string, unknown>): Promise<unknown>;
-  get(key: string): Promise<{ body: ReadableStream; httpMetadata?: { contentType?: string } } | null>;
-  delete(key: string): Promise<void>;
-}
-
 export interface KVNamespaceLike {
   get(key: string): Promise<string | null>;
   put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
@@ -44,11 +38,13 @@ export interface QueueProducerLike {
 declare global {
   interface CloudflareEnv {
     DB?: D1DatabaseLike;
-    PROPERTY_MEDIA?: R2BucketLike;
     CACHE?: KVNamespaceLike;
     BOOKING_QUEUE?: QueueProducerLike;
     APP_ENV?: string;
     APP_URL?: string;
+    SUPABASE_URL?: string;
+    SUPABASE_SERVICE_ROLE_KEY?: string;
+    SUPABASE_STORAGE_BUCKET?: string;
   }
 
   // Populated by the OpenNext Cloudflare adapter at runtime.

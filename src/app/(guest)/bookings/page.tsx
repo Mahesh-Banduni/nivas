@@ -88,7 +88,7 @@ export default async function BookingsPage({
                   className="h-32 w-full shrink-0 overflow-hidden rounded-lg bg-sand sm:h-24 sm:w-32"
                 >
                   <ArtImage
-                    r2Key={booking.cover_key}
+                    mediaKey={booking.cover_key}
                     url={booking.cover_url}
                     type={booking.property_type}
                     alt={booking.property_title}

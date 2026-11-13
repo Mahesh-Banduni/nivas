@@ -65,7 +65,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
             <div className="flex gap-4 p-4">
               <div className="h-28 w-36 shrink-0 overflow-hidden rounded-lg bg-sand">
                 <ArtImage
-                  r2Key={booking.cover_key}
+                  mediaKey={booking.cover_key}
                   url={booking.cover_url}
                   type={booking.property_type}
                   alt={booking.property_title}
